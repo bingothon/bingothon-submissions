@@ -1,0 +1,38 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Marathon Submissions</title>
+    <script src="/js/jquery-3.2.1.min.js" charset="utf-8"></script>
+    <script src="/sem/semantic.min.js" charset="utf-8"></script>
+
+    <link rel="stylesheet" href="/sem/semantic.min.css">
+    <link class="dark-theme-css" rel="stylesheet" href="/sem/semantic.cyborg.min.css" disabled>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+      .content {
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="ui container">
+      <div class="ui modal">
+        <div class="ui icon header">
+          <i class="icon settings"></i>
+          Maintenance
+        </div>
+        <div class="content">
+          <h5>We're currently undergoing maintenance.</h5>
+          <h5>Please bear with us.</h5>
+          {{#if profile}}
+          <a class="ui red button" href="/logout"><i class="icon sign out"></i>Logout</a>
+          {{else}}
+          <a class="ui purple button login"><i class="icon twitch"></i>Login with Twitch</a>
+          {{/if}}
+        </div>
+      </div>
+    </div>
+    {{> load-javascript src="maintenance"}}
+  </body>
+</html>

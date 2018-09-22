@@ -1,0 +1,69 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Marathon Submissions</title>
+    <script src="/js/jquery-3.2.1.min.js" charset="utf-8"></script>
+    <script src="/sem/semantic.min.js" charset="utf-8"></script>
+    <script src="/js/moment.js" charset="utf-8"></script>
+    <script src="/js/moment-timezone.js" charset="utf-8"></script>
+
+    <link rel="stylesheet" href="/sem/semantic.min.css">
+    <link class="dark-theme-css" rel="stylesheet" href="/sem/semantic.cyborg.min.css" disabled>
+    <link class="light-theme-fix-css" rel="stylesheet" href="/css/light-theme-fix.css">
+    <link rel="stylesheet" href="/css/style.css">
+
+    {{> sidebar/js}}
+  </head>
+  <body class="pushable">
+    {{> sidebar/html}}
+    <div class="pusher">
+      <header>
+        {{> header}}
+      </header>
+
+      <header>
+        <div class="ui pointing two item menu">
+          <div class="ui dropdown link item">
+            Status
+            <i class="dropdown icon"></i>
+            <div class="menu filter-menu">
+              <a class="ui active item" filter-type="0">All Runs</a>
+              <a class="ui blue item" filter-type="1"><i class="icon question mark"></i>Pending</a>
+              <a class="ui green item" filter-type="2"><i class="icon checkmark"></i>Accepted</a>
+              <a class="ui red item" filter-type="3"><i class="icon ban"></i>Rejected</a>
+            </div>
+          </div>
+          <div class="ui dropdown link item">
+            Sorting
+            <i class="dropdown icon"></i>
+            <div class="menu sorting-menu">
+              <div class="header">Submission Date</div>
+              <div class="active item" sort-type="date" sort-mode="asc">Ascending <em>(Oldest to Newest)</em></div>
+              <div class="item" sort-type="date" sort-mode="desc">Descending <em>(Newest to Oldest)</em></div>
+              <div class="divider"></div>
+              <div class="header">Game Name</div>
+              <div class="item" sort-type="game" sort-mode="asc">Ascending <em>(A-Z)</em></div>
+              <div class="item" sort-type="game" sort-mode="desc">Descending <em>(Z-A)</em></div>
+              <div class="divider"></div>
+              <div class="header">Runner Name <em>(Twitch Display Name)</em></div>
+              <div class="item" sort-type="runner" sort-mode="asc">Ascending <em>(A-Z)</em></div>
+              <div class="item" sort-type="runner" sort-mode="desc">Descending <em>(Z-A)</em></div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="ui fluid container">
+        <div class="ui styled fluid accordion submissions">
+        </div>
+      </div>
+    </div>
+    {{> load-decode-content }}
+    {{> decode-content var-name="data" data=submission_data }}
+    {{> decode-content var-name="eventData" data=eventData }}
+    {{> load-javascript src="submissions/view" }}
+  </body>
+
+  {{> submission/main view="public"}}
+</html>

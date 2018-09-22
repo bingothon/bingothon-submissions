@@ -1,0 +1,22 @@
+<script type="text/javascript">
+  function setDarkTheme (on) {
+    localStorage.setItem('darkTheme', JSON.stringify(on));
+    $('.dark-theme i').removeClass('on off');
+    $('.dark-theme i').addClass(on ? 'on' : 'off');
+    $('.dark-theme-css').prop('disabled', !on);
+    $('.light-theme-fix-css').prop('disabled', on);
+  }
+
+  $(function () {
+    $('.toc').click(() => $('.ui.sidebar').sidebar({ transition: 'overlay', mobileTransition: 'overlay' }).sidebar('toggle'));
+
+    $('.dark-theme').on('click', function () {
+      setDarkTheme(!JSON.parse(localStorage.getItem('darkTheme')));
+    });
+
+    setDarkTheme(darkTheme);
+  });
+
+  let darkTheme = JSON.parse(localStorage.getItem('darkTheme'));
+  setDarkTheme(darkTheme);
+</script>

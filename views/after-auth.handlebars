@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Auth Success</title>
+  </head>
+  <body>
+    <script type="text/javascript">
+      function decodeContent (encodedStr) {
+        if (encodedStr === '') {
+          return {};
+        }
+        
+        let parser = new DOMParser;
+        let dom = parser.parseFromString(encodedStr, 'text/html');
+        return JSON.parse(dom.body.textContent);
+      }
+
+      if (window.opener) {
+        window.opener.focus();
+
+        let auth = decodeContent('{{auth}}');
+        if (auth && auth.state === 'success') {
+          var user = decodeContent('{{user}}');
+        }
+        window.opener.authState(auth, user);
+        window.close();
+      } else {
+        window.location = '/';
+      }
+    </script>
+  </body>
+</html>

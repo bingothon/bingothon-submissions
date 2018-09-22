@@ -1,0 +1,143 @@
+﻿<!--TODO: Option to update username from Twitch (after a display name change)-->
+<!-- Just tell the user to log out and back in lol -->
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Connected Accounts</title>
+    <script src="/js/jquery-3.2.1.min.js" charset="utf-8"></script>
+    <script src="/sem/semantic.min.js" charset="utf-8"></script>
+
+    <link rel="stylesheet" href="/sem/semantic.min.css">
+    <link class="dark-theme-css" rel="stylesheet" href="/sem/semantic.cyborg.min.css" disabled>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/user/connections.css">
+
+    {{> sidebar/js}}
+  </head>
+  <body class="pushable">
+    {{> sidebar/html}}
+    <div class="pusher">
+      <header>
+        {{> header}}
+      </header>
+
+      <div class="ui container">
+        <div class="ui hidden divider"></div>
+        {{#if profile}}
+        <!-- Twitch -->
+        <div class="ui equal width grid">
+          <div class="row">
+            <div class="center aligned large screen only column"></div>
+            <div class="center aligned middle aligned column"><a href="https://twitch.tv/" target="_blank"><i class="huge purple twitch icon"></i></a></div>
+            <div class="center aligned middle aligned column">
+              <img class="ui tiny avatar image" src="{{profile.avatar}}">
+              <p></p>
+              <a class="ui large purple label" href="https://twitch.tv/{{profile.username}}" target="_blank">
+                {{profile.displayName}}
+              </a>
+            </div>
+            <div class="center aligned large screen only column"></div>
+          </div>
+        </div>
+        <div class="ui section divider"></div>
+        <!-- Speedrun.com -->
+        <div class="ui equal width grid">
+          <div class="row">
+            <div class="center aligned large screen only column"></div>
+            <div class="center aligned middle aligned column"><a href="https://speedrun.com/" target="_blank"><img src="/image/speedrun-icon.png"></img></a></div>
+            <div class="center aligned middle aligned column">
+              <div class="ui action input">
+                <input class="speedrun-com-username-input" type="text" value="{{profile.speedrunComUser}}" placeholder="SR.com Username" maxlength="32">
+                <button class="ui green button save-speedrun-com-username">Save</button>
+              </div>
+              <p></p>
+              <a href="https://speedrun.com/user/{{profile.speedrunComUser}}">https://speedrun.com/user/{{profile.speedrunComUser}}</a>
+            </div>
+            <div class="center aligned large screen only column"></div>
+          </div>
+        </div>
+        <div class="ui section divider"></div>
+        <!-- Discord -->
+        <div class="ui equal width grid">
+          <div class="row">
+            <div class="center aligned large screen only column"></div>
+            <div class="center aligned middle aligned column"><a href="https://discordapp.com/" target="_blank"><i class="huge blue icon-discord icon"></i></a></div>
+            <div class="center aligned middle aligned column">
+              {{#if profile.connections.discord.username}}
+              <img class="ui tiny avatar image" src="{{profile.connections.discord.avatar}}">
+              <p></p>
+              <div class="ui animated fade red button unlink-button" tabindex="0" d-type="discord">
+                <div class="visible content">{{profile.connections.discord.username}}#{{profile.connections.discord.discriminator}}</div>
+                <div class="hidden content">Unlink</div>
+              </div>
+              {{else}}
+              <div class="ui blue button link-button" d-type="discord">Link</div>
+              {{/if}}
+            </div>
+            <div class="center aligned large screen only column"></div>
+          </div>
+        </div>
+        <div class="ui section divider"></div>
+        <!-- Twitter -->
+        <div class="ui equal width grid">
+          <div class="row">
+            <div class="center aligned large screen only column"></div>
+            <div class="center aligned middle aligned column"><a href="https://twitter.com/" target="_blank"><i class="huge blue twitter icon"></i></a></div>
+            <div class="center aligned middle aligned column">
+              {{#if profile.connections.twitter.username}}
+              <img class="ui tiny avatar image" src="{{profile.connections.twitter.avatar}}">
+              <p></p>
+              <div class="ui animated fade red button unlink-button" tabindex="0" d-type="twitter">
+                <div class="visible content">@{{profile.connections.twitter.username}}</div>
+                <div class="hidden content">Unlink</div>
+              </div>
+              {{else}}
+              <div class="ui blue button link-button" d-type="twitter">Link</div>
+              {{/if}}
+            </div>
+            <div class="center aligned large screen only column"></div>
+          </div>
+        </div>
+        <div class="ui section divider"></div>
+        <!-- Youtube -->
+        <div class="ui equal width grid">
+          <div class="row">
+            <div class="center aligned large screen only column"></div>
+            <div class="center aligned middle aligned column"><a href="https://youtube.com/" target="_blank"><i class="huge red youtube icon"></i></a></div>
+            <div class="center aligned middle aligned column">
+              {{#if profile.connections.youtube.displayName}}
+              <img class="ui tiny avatar image" src="{{profile.connections.youtube.avatar}}">
+              <p></p>
+              <div class="ui animated fade red button unlink-button" tabindex="0" d-type="youtube">
+                <div class="visible content">{{profile.connections.youtube.displayName}}</div>
+                <div class="hidden content">Unlink</div>
+              </div>
+              {{else}}
+              <div class="ui blue button link-button" d-type="youtube">Link</div>
+              {{/if}}
+            </div>
+            <div class="center aligned large screen only column"></div>
+          </div>
+        </div>
+        {{/if}}
+      </div>
+    </div>
+    <div class="ui modal update-speedrun-username-modal">
+      <div class="content">
+        <div class="description">
+          <div class="ui header">Success! Your Speedrun.com username was updated!</div>
+          <p>The page will automatically reload in 3 seconds ...</p>
+        </div>
+      </div>
+    </div>
+    {{> load-decode-content }}
+    {{> load-csrf }}
+    <!-- Can't use partial here because of the JSONstringify helper -->
+    <script type="text/javascript">
+      var connections = decodeContent('{{JSONstringify profile.connections}}');
+    </script>
+    {{> load-javascript src="user/connections" }}
+  </body>
+</html>

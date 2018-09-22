@@ -1,0 +1,184 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Marathon Submissions</title>
+    <script src="/js/jquery-3.2.1.min.js" charset="utf-8"></script>
+    <script src="/sem/semantic.min.js" charset="utf-8"></script>
+    <script src="/js/jquery.datepair.min.js" charset="utf-8"></script>
+    <script src="/js/pikaday.js" charset="utf-8"></script>
+    <script src="/js/pikaday.jquery.js" charset="utf-8"></script>
+    <script src="/js/jquery.timepicker.min.js" charset="utf-8"></script>
+    <script src="/js/moment.js" charset="utf-8"></script>
+    <script src="/js/moment-timezone.js" charset="utf-8"></script>
+
+    <link rel="stylesheet" href="/sem/semantic.min.css">
+    <link class="dark-theme-css" rel="stylesheet" href="/sem/semantic.cyborg.min.css" disabled>
+    <link class="light-theme-fix-css" rel="stylesheet" href="/css/light-theme-fix.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/submissions/submit.css">
+    <link rel="stylesheet" href="/css/jquery.timepicker.css">
+    <link rel="stylesheet" href="/css/pikaday.css">
+
+    {{> sidebar/js}}
+  </head>
+  <body class="pushable">
+    {{> sidebar/html}}
+    <div class="pusher">
+      <header>
+        {{> header}}
+      </header>
+
+      <div class="ui container">
+        <div class="ui hidden divider"></div>
+        <div class="ui" {{#if profile.speedrunComUser}} style="display: none;" {{/if}}>
+          <div class="ui warning message">
+            <div class="header">No Speedrun.com username set!</div>
+            <p>You cannot submit runs unless you have set your Speedrun.com username in your connections page!</p>
+            <a href="/user/connections">Click here to go to your connections page!</a>
+          </div>
+          <div class="ui hidden divider"></div>
+        </div>
+        <div class="ui" {{#if profile.connections.discord.username}} style="display: none;" {{/if}}>
+          <div class="ui warning message">
+            <div class="header">Discord not linked to your Account!</div>
+            <p>Discord is the main tool for all forms of communication leading up to the main event and will also be the way for the game selection and scheduling team to contact you.</p>
+            <p>If you don't have an account yet, please get one <a href="https://discordapp.com/" target="_blank">here</a> and join our <a href="http://discord.powerupwithpride.org" target="_blank">Discord Server.</a></p>
+            <div class="ui hidden divider"></div>
+            <a href="/user/connections">Click here to go to your connections page!</a>
+          </div>
+          <div class="ui hidden divider"></div>
+        </div>
+        {{#eq submissionState 1}}
+          {{#if canSubmit}}
+          <div class="ui blurring basic segment">
+            <div class="ui inverted dimmer"></div>
+            <div class="ui {{#unless profile.connections.discord.username}}warning {{/unless}}form">
+              <div class="form-container to-show">
+                <h4 class="ui dividing header">Game Information</h4>
+                <div class="three fields">
+                  <div class="required {{#unless profile.connections.discord.username}}disabled {{/unless}}field ui search game-search">
+                    <label>Game</label>
+                    <div class="ui icon input">
+                      <input class="prompt" type="text" name="game" placeholder="Game name..." invalidname="game" maxlength="100">
+                      <i class="search icon"></i>
+                    </div>
+                    <div class="results"></div>
+                  </div>
+                  <div class="required {{#unless profile.connections.discord.username}}disabled {{/unless}}field">
+                    <label>Platform</label>
+                    <input type="text" name="platform" placeholder="PC, N64, ..." invalidname="platform" maxlength="32">
+                  </div>
+                  <div class="required {{#unless profile.connections.discord.username}}disabled {{/unless}}field">
+                    <label>Region</label>
+                    <input type="text" name="region" placeholder="NTSC, PAL, ..." invalidname="region" maxlength="32">
+                  </div>
+                </div>
+                <div class="three fields">
+                  <div class="required {{#unless profile.connections.discord.username}}disabled {{/unless}}field">
+                    <label>Category</label>
+                    <input type="text" name="category" placeholder="Any%, 100%, ..." invalidname="category" maxlength="32">
+                  </div>
+                  <div class="required {{#unless profile.connections.discord.username}}disabled {{/unless}}field popup" data-content="Your estimate should be the time that you can reliably complete a no reset run in. It must also include any non-optional content after last control, for example watching credits in Super Metroid.">
+                    <label>Estimate</label>
+                    <input type="text" name="estimate" placeholder="00:30:00" invalidname="estimate">
+                  </div>
+                  <div class="required {{#unless profile.connections.discord.username}}disabled {{/unless}}field">
+                    <label>Video</label>
+                    <input type="text" name="video" placeholder="http(s)://" invalidname="video" maxlength="200">
+                  </div>
+                </div>
+                <div class="two fields">
+                  <div class="required {{#unless profile.connections.discord.username}}disabled {{/unless}}field popup" data-title="Not correct?" data-content="You can set it manually!">
+                    <label>Leaderboards</label>
+                    <input type="text" name="leaderboards" placeholder="http(s)://" invalidname="leaderboards" maxlength="200">
+                  </div>
+                  <div class="required {{#unless profile.connections.discord.username}}disabled {{/unless}}field popup" data-title="Not correct?" data-content="You can set it manually!">
+                    <label>Twitch Game Name</label>
+                    <input type="text" name="twitch-name" invalidname="twitch-name" maxlength="200">
+                  </div>
+                </div>
+                <div class="inline {{#unless profile.connections.discord.username}}disabled {{/unless}}field">
+                  <div class="ui toggle checkbox race-checkbox">
+                    <input type="checkbox" tabindex="0" class="hidden">
+                    <label>This is a race / relay / co-op run</label>
+                  </div>
+                </div>
+                <div class="race-info">
+                  <h4 class="ui dividing header">Runner Nomination</h4>
+                  <select class="ui multiple search selection dropdown race-dropdown" multiple="">
+                  </select>
+                </div>
+                <div class="ui hidden divider"></div>
+                <h4 class="ui left floated header">Availability</h4>
+                <h4 class="ui right floated header"></h4>
+                <div class="ui hidden divider"></div>
+                <h4 class="ui dividing header"></h4>
+                <div class="{{#unless profile.connections.discord.username}}disabled {{/unless}}field">
+                  <textarea class="availability-textarea" maxlength="750" rows="6" placeholder="Please tell us your estimate as to when you're available during the event..."></textarea>
+                  <label class="chars-used">0/750</label>
+                </div>
+				<h4 class="ui dividing header">Donation Incentives / Bid Wars (Optional)</h4>
+                <div class="{{#unless profile.connections.discord.username}}disabled {{/unless}}field">
+                  <textarea class="incentives-textarea" maxlength="750" rows="6" placeholder="Donation incentives should not add much more than five minutes to your run/showcase."></textarea>
+                  <label class="chars-used">0/750</label>
+                </div>
+                <h4 class="ui dividing header">Comments (Optional)</h4>
+                <div class="{{#unless profile.connections.discord.username}}disabled {{/unless}}field">
+                  <textarea class="comments-textarea" maxlength="750" rows="6" placeholder="Write additional information about your submission here..."></textarea>
+                  <label class="chars-used">0/750</label>
+                </div>
+                <div class="ui error message">
+                  <div class="header">An error has occured!</div>
+                  <p><span class="error-message"></span></p>
+                </div>
+                <p></p>
+                <div class="ui {{#unless profile.connections.discord.username}}disabled {{/unless}}positive button submit-run" tabindex="0">Submit</div>
+              </div>
+              <div class="ui hidden icon message submit-waiting">
+                <i class="notched circle loading icon"></i>
+              </div>
+              <div class="ui success message submit-success">
+                <div class="header">Submission successful!</div>
+                <p>The run "<strong class="submit-success-message-game">##game##: ##category##</strong>" has been submitted!</p>
+              </div>
+              <div class="ui error hidden message submit-error">
+                <div class="header">Submission failed!</div>
+                <p>The submission has failed for the following reason: <strong class="submit-error-message-reason">##error##</strong></p>
+              </div>
+            </div>
+          </div>
+          {{else}}
+          <div class="ui">
+            <div class="ui negative message">
+              <div class="header">You can't submit any more runs!</div>
+              <p>Sorry, but you exceeded the submission limit!</p>
+            </div>
+          </div>
+          {{/if}}
+        {{else eq submissionState 0}}
+        <div class="ui">
+          <div class="ui negative message">
+            <div class="header">Submissions aren't open yet!</div>
+            <p>Sorry, but submissions aren't open yet. Please come back at a later point!</p>
+          </div>
+        </div>
+        {{else}}
+        <div class="ui">
+          <div class="ui negative message">
+            <div class="header">Submissions are closed!</div>
+            <p>Sorry, but submissions are closed, you were a bit too late.</p>
+          </div>
+        </div>
+        {{/eq}}
+      </div>
+    </div>
+    {{> load-decode-content }}
+    {{> load-csrf }}
+    {{> decode-content var-name="eventData" data=eventData }}
+    {{> decode-content var-name="profileId" data=profile.id }}
+    {{> load-direct var-name="srComUsername" data=profile.speedrunComUser }}
+    {{> load-direct var-name="discordUsername" data=profile.connections.discord.username }}
+    {{> load-javascript src="submissions/submit"}}
+  </body>
+</html>

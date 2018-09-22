@@ -1,0 +1,11 @@
+{
+  "urls": {
+    "base": "auth/",
+    "twitch": "twitch/",
+    "discord": "discord/",
+    "twitter": "twitter/",
+    "youtube":  "youtube/",
+    "callback": "callback/",
+    "unlink": "unlink/"
+  }
+}

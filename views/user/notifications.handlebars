@@ -1,0 +1,72 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Marathon Submissions</title>
+    <script src="/js/jquery-3.2.1.min.js" charset="utf-8"></script>
+    <script src="/sem/semantic.min.js" charset="utf-8"></script>
+    <script src="/js/moment.js" charset="utf-8"></script>
+    <script src="/js/showdown.min.js" charset="utf-8"></script>
+
+    <link rel="stylesheet" href="/sem/semantic.min.css">
+    <link class="dark-theme-css" rel="stylesheet" href="/sem/semantic.cyborg.min.css" disabled>
+    <link rel="stylesheet" href="/css/style.css">
+
+    {{> sidebar/js}}
+  </head>
+  <body class="pushable">
+    {{> sidebar/html}}
+    <div class="pusher">
+      <header>
+        {{> header}}
+      </header>
+
+      <div class="ui fluid container">
+        <div class="ui styled fluid accordion notifications">
+        </div>
+      </div>
+    </div>
+    {{> load-decode-content }}
+    {{> load-csrf }}
+    {{> decode-content var-name="notifications" data=notifications}}
+    {{> load-javascript src="user/notifications"}}
+  </body>
+
+  <template id="notification-template">
+    <div class="notification" uuid="##uuid##">
+      <div class="title">
+        <label class="ui mini horizontal label">##timestamp##</label><label class="ui ##label-color## mini horizontal label read-indicator">##label-text##</label>
+        <i class="dropdown icon"></i>
+        ##subject##
+      </div>
+      <div class="content">
+        ##content##
+        <div class="ui mini basic negative icon button remove-notification">
+          <i class="icon trash can"></i>Remove
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template id="notification-race-template">
+    <div class="notification" uuid="##uuid##">
+      <div class="title">
+        <label class="ui mini horizontal label">##timestamp##</label><label class="ui ##label-color## mini horizontal label read-indicator">##label-text##</label>
+        <i class="dropdown icon"></i>
+        ##subject##
+      </div>
+      <div class="content">
+        ##content##
+        <div class="ui mini basic positive icon button accept-nomination">
+          <i class="icon thumbs up"></i>Accept
+        </div>
+        <div class="ui mini basic negative icon button decline-nomination">
+          <i class="icon thumbs down"></i>Decline
+        </div>
+        <div class="ui mini basic negative icon button remove-notification">
+          <i class="icon trash can"></i>Remove
+        </div>
+      </div>
+    </div>
+  </template>
+</html>

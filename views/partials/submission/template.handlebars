@@ -1,0 +1,147 @@
+<template id="{{id}}">
+  <div class="submission" uuid="##uuid##" state="##state##">
+    <div class="title">
+      <div class="ui four column grid">
+        <div class="middle aligned column">
+          <i class="icon dropdown"></i>
+          <label class="ui status ##status-color## label">##status-text##</label> <span class="game">##game##</span> <em>(##category##)</em>
+        </div>
+        {{#eq view "private"}}
+        <div class="middle aligned column">
+          Category: <em>##category##</em>
+        </div>
+        {{else}}
+        <div class="middle aligned column">
+          {{#unlessEq view "private"}}
+          <img class="ui avatar mini image" src="##avatar##">
+          {{/unlessEq}}
+          Runner: <em>##runner-name##</em>
+        </div>
+        <div class="middle aligned column">
+          Platform: <em>##platform##</em>, Region: <em>##region##</em>
+        </div>
+        {{/eq}}
+      </div>
+    </div>
+    <div class="content">
+      <div class="ui five column grid">
+        <div class="row">
+          <div class="center aligned column"></div>
+          <div class="center aligned column">
+            <h3>Game Info</h3>
+          </div>
+          <div class="center aligned column">
+            <h3>Availability</h3>
+          </div>
+          <div class="center aligned column">
+            <h3>Donation Incentives / Bid Wars</h3>
+          </div>
+          <div class="center aligned column">
+            <h3>Comments</h3>
+          </div>
+        </div>
+        <div class="middle aligned row">
+          {{#eq view "public"}}
+          <div class="center aligned column">
+            <img class="ui avatar small image" src="##avatar##">
+            <h5>##display-name##</h5>
+            <p></p>
+            <a class="ui circular icon button violet twitch" href="https://twitch.tv/##twitch##" data-tooltip="##twitch##" data-position="top center" target="_blank"><i class="icon twitch"></i></a>
+            <a class="ui circular icon button" href="https://speedrun.com/user/##speedrun-com-user##" data-tooltip="##speedrun-com-user##" data-position="top center" target="_blank"><img class="ui icon" src="https://www.speedrun.com/themes/Default/1st.png"></img></a>
+            <a class="ui circular icon button blue discord to-show" discord-id="##discord##" data-tooltip="##discord##" data-position="top center"><i class="icon icon-discord"></i></a>
+            <a class="ui circular icon button twitter to-show" href="https://twitter.com/##twitter##" data-tooltip="@##twitter##" data-position="top center" target="_blank"><i class="icon twitter"></i></a>
+            <a class="ui circular icon button youtube to-show" href="https://youtube.com/channel/##youtube-id##" data-tooltip="##youtube##" data-position="top center" target="_blank"><i class="icon youtube"></i></a>
+          </div>
+          {{/eq}}
+          {{#eq view "private"}}
+          <div class="center aligned column">
+            <div class="ui buttons">
+              <button class="ui blue button edit-button"><i class="icon wrench"></i>Edit</button>
+              <button class="ui red button remove-button"><i class="icon trash can"></i>Remove</button>
+            </div>
+          </div>
+          {{/eq}}
+          {{#eq view "admin"}}
+          <div class="center aligned column">
+            <img class="ui avatar small image" src="##avatar##">
+            <h5>##display-name##</h5>
+            <p></p>
+            <a class="ui circular icon button violet twitch" href="https://twitch.tv/##twitch##" data-tooltip="##twitch##" data-position="top center" target="_blank"><i class="icon twitch"></i></a>
+            <a class="ui circular icon button" href="https://speedrun.com/user/##speedrun-com-user##" data-tooltip="##speedrun-com-user##" data-position="top center" target="_blank"><img class="ui icon" src="https://www.speedrun.com/themes/Default/1st.png"></img></a>
+            <a class="ui circular icon button blue discord to-show" discord-id="##discord##" data-tooltip="##discord##" data-position="top center"><i class="icon icon-discord"></i></a>
+            <a class="ui circular icon button twitter to-show" href="https://twitter.com/##twitter##" data-tooltip="@##twitter##" data-position="top center" target="_blank"><i class="icon twitter"></i></a>
+            <a class="ui circular icon button youtube to-show" href="https://youtube.com/channel/##youtube-id##" data-tooltip="##youtube##" data-position="top center" target="_blank"><i class="icon youtube"></i></a>
+            <p></p>
+            <div class="ui toggle checkbox visibility-toggle">
+              <input type="checkbox" name="visible">
+              <label>Visible</label>
+            </div>
+            <p></p>
+            <div class="ui buttons">
+              <div class="ui blue button pending-run"><i class="icon question mark"></i>Pending</div>
+              <div class="ui positive button accept-run"><i class="icon checkmark"></i>Accept</div>
+              <div class="ui negative button reject-run"><i class="icon ban"></i>Reject</div>
+            </div>
+            <p></p>
+            <div class="ui buttons">
+              <div class="ui blue button edit-run"><i class="icon wrench"></i>Edit</div>
+              <div class="ui red button delete-run"><i class="icon trash can"></i>Delete Submission</div>
+            </div>
+          </div>
+          {{/eq}}
+          <!-- Game Info -->
+          <div class="center aligned column game-info">
+            <h4>Game:</h4>
+            <a target="_blank" class="game-link" data-tooltip="Platform: ##platform##, Region: ##region##" data-position="bottom center">##game##</a>
+            <p class="game-no-link" data-tooltip="Platform: ##platform##, Region: ##region##" data-position="bottom center">##game##</p>
+            <h4>Category:</h4>
+            <p class="category">##category##</p>
+            <h4>Estimate:</h4>
+            <p class="estimate">##estimate##</p>
+            <h4>Video:</h4>
+            <a href="##video##" class="video" target="_blank">##video##</a>
+            {{#if isRace}}
+              <h4>Other Runners:</h4>
+              <p class="runners">##runners##</p>
+            {{/if}}
+          </div>
+          <!-- Availability -->
+          <div class="center aligned column">
+            <div class="ui segments">
+              <div class="ui segment availability">
+                <p></p>
+              </div>
+            </div>
+          </div>
+          <!-- Availability -->
+          <div class="center aligned column">
+            <div class="ui segments">
+              <div class="ui segment incentives">
+                <p></p>
+              </div>
+            </div>
+          </div>
+          <!-- Comments -->
+          <div class="center aligned column">
+            <div class="ui segments">
+              <div class="ui segment comments">
+                <h4>Submission comments:</h4>
+                <p></p>
+              </div>
+              {{#eq view "admin"}}
+              <div class="ui segment admin-comments">
+                <h4>Admin comments:</h4>
+                <p></p>
+              </div>
+              {{/eq}}
+            </div>
+            {{#eq view "admin"}}
+            <div class="ui blue icon button edit-reason-button reason-button"><i class="wrench icon"></i> Edit Admin Comment</div>
+            <div class="ui green icon button add-reason-button reason-button" style="display: none;"><i class="plus icon"></i> Add Admin Comment</div>
+            {{/eq}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

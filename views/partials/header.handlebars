@@ -1,0 +1,11 @@
+<div class="ui pointing menu">
+  <a class="toc item"><i class="sidebar icon"></i>{{#gt notificationCount 0}}<label class="ui red mini empty circular label"></label>{{/gt}}</a>
+  <div class="right menu">
+    <a class="item" href="/about"><i class="icon question mark"></i>About</a>
+    {{#if profile}}
+    <a class="item" href="/logout"><i class="icon sign out"></i>Logout</a>
+    {{else}}
+    <a class="ui item" href="/auth/twitch"><i class="icon twitch"></i>Login with Twitch</a>
+    {{/if}}
+  </div>
+</div>

@@ -1,0 +1,66 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Marathon Submissions</title>
+    <script src="/js/jquery-3.2.1.min.js" charset="utf-8"></script>
+    <script src="/js/jquery.cookie.min.js" charset="utf-8"></script>
+    <script src="/sem/semantic.min.js" charset="utf-8"></script>
+    <script src="/js/moment.js" charset="utf-8"></script>
+    <script src="/js/moment-timezone.js" charset="utf-8"></script>
+    <script src="/js/showdown.min.js" charset="utf-8"></script>
+
+    <link rel="stylesheet" href="/sem/semantic.min.css">
+    <link class="dark-theme-css" rel="stylesheet" href="/sem/semantic.cyborg.min.css" disabled>
+    <link rel="stylesheet" href="/css/style.css">
+
+    {{> sidebar/js}}
+
+  </head>
+  <body class="pushable">
+    {{> sidebar/html}}
+    <div class="pusher">
+      <header>
+        {{> header}}
+      </header>
+
+      <div class="ui container">
+        <div class="ui hidden divider"></div>
+        <div class="ui container">
+          <div class="ui top attached clearing segment header">
+            <h2 class="ui left floated header marathon-name"></h2>
+          </div>
+          <div class="ui attached segment">
+            <p><b>Timezone</b>: <span class="timezone">Timezone</span></p>
+            <p><b>Start</b>: <span class="event-from">From (in marathon timezone)</span></p>
+            <p><b>End</b>: <span class="event-to">To</span></p>
+            <p><b>Maximum number of submissions per user</b>: <span class="submission-limit"></span></p>
+            {{#if profile}}
+            <p><a href="/submissions/submit" class="medium green labeled icon ui button">
+                <i class="icon edit"></i>
+                Submit
+            </a></p>
+            {{else}}
+            <p><a href="/auth/twitch" class="medium purple labeled icon ui button">
+                <i class="icon twitch"></i>
+                Login with Twitch
+            </a></p>
+            {{/if}}
+          </div>
+          <div class="ui top attached clearing segment header">
+            <h3 class="ui left floated header">
+              And now a word from the organizers
+            </h3>
+          </div>
+          <div class="ui attached segment">
+            <div class="content markdown-content">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {{> load-decode-content }}
+    {{> decode-content var-name="eventData" data=eventData}}
+    {{> load-javascript src="index"}}
+  </body>
+</html>

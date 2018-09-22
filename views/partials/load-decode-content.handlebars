@@ -1,0 +1,9 @@
+<script type="text/javascript">
+  function decodeContent (encodedStr) {
+    encodedStr = decodeURI(encodedStr);
+
+    let parser = new DOMParser;
+    let dom = parser.parseFromString(encodedStr, 'text/html');
+    return JSON.parse(dom.body.textContent);
+  }
+</script>

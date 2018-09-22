@@ -1,0 +1,11 @@
+/* For black headers in modals */
+.modal .ui.form .header, 
+.modal .ui.form label,
+.modal .header {
+    color: white;
+}
+
+/* So the unchecked toggles are actually visible */
+.ui.toggle.checkbox label::before {
+    background: rgba(0, 0, 0, 0.15);
+}

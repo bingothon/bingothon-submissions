@@ -1,0 +1,371 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Marathon Submissions</title>
+    <script src="/js/jquery-3.2.1.min.js" charset="utf-8"></script>
+    <script src="/sem/semantic.min.js" charset="utf-8"></script>
+    <script src="/js/moment.js" charset="utf-8"></script>
+    <script src="/js/moment-timezone.js" charset="utf-8"></script>
+    <script src="/js/remarkable.min.js" charset="utf-8"></script>
+    <script src="/js/cheet.min.js" charset="utf-8"></script>
+    <script src="/js/howler.min.js" charset="utf-8"></script>
+
+    <link rel="stylesheet" href="/sem/semantic.min.css">
+    <link class="dark-theme-css" rel="stylesheet" href="/sem/semantic.cyborg.min.css" disabled>
+    <link class="light-theme-fix-css" rel="stylesheet" href="/css/light-theme-fix.css">
+    <link rel="stylesheet" href="/css/style.css">
+
+    {{> sidebar/js}}
+  </head>
+  <body class="pushable">
+    {{> sidebar/html}}
+    <div class="pusher">
+      <header>
+        {{> header}}
+      </header>
+
+      <div class="ui container">
+        <div class="ui hidden divider"></div>
+        <div class="ui two column grid">
+          <div class="row">
+            <div class="middle aligned column">
+              <div class="ui segment">
+                <div class="ui center aligned header">Users</div>
+                <div class="ui search selection dropdown fluid admins">
+                  <div class="default text"></div>
+                  <i class="dropdown icon"></i>
+                </div>
+                <p></p>
+                <div class="ui fluid buttons">
+                  <div class="ui positive button add-user"><i class="icon plus"></i>Add</div>
+                  <div class="ui blue button edit-user disabled"><i class="icon wrench"></i>Edit</div>
+                  <div class="ui negative button remove-user disabled"><i class="icon minus"></i>Remove</div>
+                </div>
+              </div>
+
+              <div class="ui segment">
+                <div class="ui center aligned header">Submissions</div>
+                <div class="ui small header">Submission Limit per User:</div>
+                <div class="ui form">
+                  <div class="field">
+                    <input type="number" name="submission-limit" min="1">
+                  </div>
+                </div>
+                <div class="ui divider"></div>
+                <div class="ui small header">Submission Stage:</div>
+                <div class="ui grid">
+                  <div class="ten wide column">
+                    <div class="ui selection dropdown submission-phase">
+                      <div class="default text"></div>
+                      <i class="dropdown icon"></i>
+                    </div>
+                  </div>
+                  <div class="right floated four wide column">
+                    <div class="ui right floated blue labeled icon button edit-stages">
+                      <i class="wrench icon"></i>
+                      <div class="content">Edit Stages</div>
+                    </div>
+                  </div>
+                </div>
+                <p></p>
+                <div class="ui fluid blue button update-submission-settings disabled"><i class="icon write"></i>Update Submission Settings</div>
+              </div>
+            </div>
+            <div class="middle aligned column">
+              <div class="ui segment">
+                <div class="ui center aligned header">Settings</div>
+                <p><b>Marathon Name: </b><code class="event-name"></code></p>
+                <p><b>Event Start: </b><code class="event-from"></code></p>
+                <p><b>Event End: </b><code class="event-to"></code></p>
+                <p><b>Event Timezone: </b><code class="event-tz"></code></p>
+                <p><b>Public Webhook: </b><code class="public-webhook" style="overflow-wrap: break-word;"></code></p>
+                <p><b>Audit Webhook: </b><code class="audit-webhook" style="overflow-wrap: break-word;"></code></p>
+                <div class="ui fluid buttons">
+                  <div class="ui blue button edit-settings"><i class="icon wrench"></i>Edit Settings</div>
+                  <div class="ui negative button reset-settings"><i class="icon trash can"></i>Reset Settings</div>
+                </div>
+              </div>
+              <div class="ui segment">
+                <div class="ui center aligned header">Event Info</div>
+                <div class="ui blue fluid button update-event-info"><i class="icon write"></i>Update Event Info</div>
+              </div>
+              <div class="ui segment">
+                <div class="ui center aligned header">Download Runs</div>
+                <a class="ui blue fluid button" href="/api/admin/settings/download-runs-csv"><i class="icon download"></i>Download CSV</a>
+                <p></p>
+                <a class="ui green fluid button" href="/api/admin/settings/download-runs-horaro"><i class="icon download"></i>Download for Horaro</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modals! -->
+      <div class="ui basic modal add-user-modal">
+        <div class="ui icon header">
+          <i class="icon add user"></i>
+          Add User
+        </div>
+        <div class="content">
+          <p>Please select the user you want to add to the users:</p>
+          <div class="ui search selection dropdown fluid users">
+            <div class="default text">Select user...</div>
+            <i class="dropdown icon"></i>
+          </div>
+          <p>Afterwards select the role you want to associate with him:</p>
+          <div class="ui search selection dropdown fluid roles">
+            <div class="default text">Select role...</div>
+            <i class="dropdown icon"></i>
+          </div>
+        </div>
+        <div class="actions">
+          <div class="ui red basic cancel inverted button">
+            <i class="remove icon"></i>
+            Cancel
+          </div>
+          <div class="ui green ok inverted button">
+            <i class="checkmark icon"></i>
+            Add
+          </div>
+        </div>
+      </div>
+
+      <div class="ui basic modal edit-user-modal">
+        <div class="ui icon header">
+          <i class="icon add user"></i>
+          Edit User
+        </div>
+        <div class="content">
+          <p>Please select the role for this user:</p>
+          <div class="ui search selection dropdown fluid roles">
+            <div class="default text">Select role...</div>
+            <i class="dropdown icon"></i>
+          </div>
+        </div>
+        <div class="actions">
+          <div class="ui red basic cancel inverted button">
+            <i class="remove icon"></i>
+            Cancel
+          </div>
+          <div class="ui green ok inverted button">
+            <i class="checkmark icon"></i>
+            Update
+          </div>
+        </div>
+      </div>
+
+      <div class="ui basic modal remove-user-modal">
+        <div class="ui icon header">
+          <i class="icon remove user"></i>
+          Remove User
+        </div>
+        <div class="content">
+          <p>Are you sure you want to revoke this user's permissions?</p>
+        </div>
+        <div class="actions">
+          <div class="ui red basic cancel inverted button">
+            <i class="remove icon"></i>
+            No
+          </div>
+          <div class="ui green ok inverted button">
+            <i class="checkmark icon"></i>
+            Yes
+          </div>
+        </div>
+      </div>
+
+      <div class="ui basic modal update-submission-settings-modal">
+        <div class="ui icon header">
+          <i class="icon calendar"></i>
+          Change Submission Phase
+        </div>
+        <div class="content">
+          <p>Are you sure you want to change the submission phase?</p>
+        </div>
+        <div class="actions">
+          <div class="ui red basic cancel inverted button">
+            <i class="remove icon"></i>
+            No
+          </div>
+          <div class="ui green ok inverted button">
+            <i class="checkmark icon"></i>
+            Yes
+          </div>
+        </div>
+      </div>
+
+      <div class="ui basic modal edit-stages-modal">
+        <div class="ui icon header">
+          <i class="icon wrench"></i>
+          Edit Submission Stages
+        </div>
+        <div class="content">
+          <div class="ui small header">Firstly, select a submission stage.<br/>Then, decide on which variables the users should be able to change in that stage.</div>
+          <div class="ui divider"></div>
+          <div class="ui top attached tabular menu edit-stages-modal-menu">
+            <a class="active item" data-tab="stage-0"><i class="ui large horizontal orange label">Not Open</i></a>
+            <a class="item" data-tab="stage-1"><i class="ui large horizontal green label">Open</i><i class="ui large horizontal blue label">Editable</i></a>
+            <a class="item" data-tab="stage-2"><i class="ui large horizontal red label">Closed</i><i class="ui large horizontal blue label">Editable</i></a>
+            <a class="item" data-tab="stage-3"><i class="ui large horizontal red label">Closed</i><i class="ui large horizontal red label">Not Editable</i></a>
+          </div>
+          <div class="ui active bottom attached tab segment" data-tab="stage-0">
+            {{> admin/settings/stage-settings editable.[0]}}
+          </div>
+          <div class="ui bottom attached tab segment" data-tab="stage-1">
+            {{> admin/settings/stage-settings editable.[1]}}
+          </div>
+          <div class="ui bottom attached tab segment" data-tab="stage-2">
+            {{> admin/settings/stage-settings editable.[2]}}
+          </div>
+          <div class="ui bottom attached tab segment" data-tab="stage-3">
+            {{> admin/settings/stage-settings editable.[3]}}
+          </div>
+        </div>
+        <div class="actions">
+          <div class="ui red basic cancel inverted button">
+            <i class="remove icon"></i>
+            Cancel
+          </div>
+          <div class="ui green ok inverted button">
+            <i class="checkmark icon"></i>
+            Save Changes
+          </div>
+        </div>
+      </div>
+
+      <div class="ui basic modal reset-settings-modal">
+        <div class="ui icon header">
+          <i class="icon erase"></i>
+          Reset Settings
+        </div>
+        <div class="content">
+          <p>You are about to reset the event settings.</p>
+          <p>Doing so might cause runs to not be in either the proper timezone or even completely out of the event's dates!</p>
+          <p>Please note down the settings somewhere before you reset them!</p>
+          <div class="ui hidden divider"></div>
+          <p>Are you sure you want to reset the settings?</p>
+        </div>
+        <div class="actions">
+          <div class="ui red basic cancel inverted button">
+            <i class="remove icon"></i>
+            Cancel
+          </div>
+          <div class="ui green ok inverted button">
+            <i class="checkmark icon"></i>
+            Yes
+          </div>
+        </div>
+      </div>
+
+      <div class="ui basic modal update-event-info-modal">
+        <div class="ui icon header">
+          <i class="icon write"></i>
+          Update Event Info
+        </div>
+        <div class="content">
+          <div class="ui form">
+            <div class="field">
+              <textarea class="event-info-textarea" rows="30"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="actions">
+          <div class="ui red basic cancel inverted button">
+            <i class="remove icon"></i>
+            Cancel
+          </div>
+          <div class="ui blue ok inverted button">
+            <i class="question mark icon"></i>
+            Preview
+          </div>
+        </div>
+      </div>
+
+      <div class="ui basic modal update-event-info-preview-modal">
+        <div class="ui icon header">
+          <i class="icon write"></i>
+          Update Event Info (Preview)
+        </div>
+        <div class="content">
+          <div class="ui segment">
+          </div>
+        </div>
+        <div class="actions">
+          <div class="ui red basic cancel inverted button">
+            <i class="arrow left icon"></i>
+            Back
+          </div>
+          <div class="ui blue ok inverted button">
+            <i class="write icon"></i>
+            Update
+          </div>
+        </div>
+      </div>
+
+      <div class="ui basic modal edit-settings-modal">
+        <div class="ui icon header">
+          <i class="icon wrench"></i>
+          Edit Settings
+        </div>
+        <div class="content">
+          <div class="ui form">
+            <div class="field">
+              <label>Marathon Name</label>
+              <input type="text" name="event-name">
+            </div>
+            <h4 class="ui dividing header">Discord Webhooks</h4>
+            <div class="field">
+              <label>Public Webhook</label>
+              <input type="text" name="public-webhook" placeholder="https://">
+            </div>
+            <div class="field">
+              <label>Audit Webhook</label>
+              <input type="text" name="audit-webhook" placeholder="https://">
+            </div>
+          </div>
+        </div>
+        <div class="actions">
+          <div class="ui red basic cancel inverted button">
+            <i class="remove icon"></i>
+            Cancel
+          </div>
+          <div class="ui blue ok inverted button">
+            <i class="question mark icon"></i>
+            Preview
+          </div>
+        </div>
+      </div>
+
+      <div class="ui basic modal edit-settings-preview-modal">
+        <div class="ui icon header">
+          <i class="icon wrench"></i>
+          Edit Settings (Preview)
+        </div>
+        <div class="content">
+          <p>Marathon Name: <code class="event-name"></code></p>
+          <p>Public Webhook: <code class="public-webhook" style="overflow-wrap: break-word;"></code></p>
+          <p>Audit Webhook: <code class="audit-webhook" style="overflow-wrap: break-word;"></code></p>
+        </div>
+        <div class="actions">
+          <div class="ui red basic cancel inverted button">
+            <i class="arrow left icon"></i>
+            Back
+          </div>
+          <div class="ui blue ok inverted button">
+            <i class="write icon"></i>
+            Update
+          </div>
+        </div>
+      </div>
+    </div>
+    {{> load-decode-content }}
+    {{> load-csrf}}
+    {{> decode-content var-name="eventData" data=eventData }}
+    {{> decode-content var-name="adminData" data=adminData }}
+    {{> decode-content var-name="admins" data=admins }}
+    {{> decode-content var-name="users" data=users }}
+    {{> decode-content var-name="profileId" data=profile.id }}
+    {{> load-javascript src="admin/settings" }}
+  </body>
+</html>

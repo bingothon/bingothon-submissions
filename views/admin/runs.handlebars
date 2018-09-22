@@ -1,0 +1,298 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Marathon Submissions</title>
+    <script src="/js/jquery-3.2.1.min.js" charset="utf-8"></script>
+    <script src="/sem/semantic.min.js" charset="utf-8"></script>
+    <script src="/js/pikaday.js" charset="utf-8"></script>
+    <script src="/js/pikaday.jquery.js" charset="utf-8"></script>
+    <script src="/js/jquery.timepicker.min.js" charset="utf-8"></script>
+    <script src="/js/moment.js" charset="utf-8"></script>
+    <script src="/js/moment-timezone.js" charset="utf-8"></script>
+    <script src="/js/jquery-ui.min.js" charset="utf-8"></script>
+    <script src="/js/jquery.datepair.min.js" charset="utf-8"></script>
+
+    <link rel="stylesheet" href="/sem/semantic.min.css">
+    <link class="dark-theme-css" rel="stylesheet" href="/sem/semantic.cyborg.min.css" disabled>
+    <link class="light-theme-fix-css" rel="stylesheet" href="/css/light-theme-fix.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin/runs.css">
+    <link rel="stylesheet" href="/css/animate.css">
+    <link rel="stylesheet" href="/css/jquery-ui.min.css">
+    <link rel="stylesheet" href="/css/jquery.timepicker.css">
+    <link rel="stylesheet" href="/css/pikaday.css">
+
+    {{> sidebar/js}}
+
+  </head>
+  <body class="pushable">
+    {{> sidebar/html}}
+    <div class="pusher">
+      <header>
+        {{> header}}
+      </header>
+
+      <header>
+        <div class="ui pointing two item menu">
+          <div class="ui dropdown link item">
+            Status
+            <i class="dropdown icon"></i>
+            <div class="menu filter-menu">
+              <a class="ui active item" filter-type="0">All Runs</a>
+              <a class="ui blue item" filter-type="1"><i class="icon question mark"></i>Pending</a>
+              <a class="ui green item" filter-type="2"><i class="icon checkmark"></i>Accepted</a>
+              <a class="ui red item" filter-type="3"><i class="icon ban"></i>Rejected</a>
+            </div>
+          </div>
+          <div class="ui dropdown link item">
+            Sorting
+            <i class="dropdown icon"></i>
+            <div class="menu sorting-menu">
+              <div class="header">Submission Date</div>
+              <div class="active item" sort-type="date" sort-mode="asc">Ascending <em>(Oldest to Newest)</em></div>
+              <div class="item" sort-type="date" sort-mode="desc">Descending <em>(Newest to Oldest)</em></div>
+              <div class="divider"></div>
+              <div class="header">Game Name</div>
+              <div class="item" sort-type="game" sort-mode="asc">Ascending <em>(A-Z)</em></div>
+              <div class="item" sort-type="game" sort-mode="desc">Descending <em>(Z-A)</em></div>
+              <div class="divider"></div>
+              <div class="header">Runner Name <em>(Twitch Display Name)</em></div>
+              <div class="item" sort-type="runner" sort-mode="asc">Ascending <em>(A-Z)</em></div>
+              <div class="item" sort-type="runner" sort-mode="desc">Descending <em>(Z-A)</em></div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="ui fluid container">
+        <div class="ui styled fluid accordion submissions">
+        </div>
+      </div>
+
+      <div class="ui basic modal pending-run-modal">
+        <div class="ui icon header">
+          <i class="icon question mark"></i>
+          Pending Submission
+        </div>
+        <div class="content">
+          <h3>You are about to set the following submission to pending:</h3>
+          <p>Runner: <code class="runner"></code></p>
+          <p>Game: <code class="game"></code></p>
+          <p>Category: <code class="category"></code></p>
+          <p>Estimate: <code class="estimate"></code></p>
+          <h3>Do you have any additional comments?</h3>
+          <div class="ui form">
+            <textarea class="comments" rows="2" maxlength="250"></textarea>
+          </div>
+        </div>
+        <div class="actions">
+          <div class="ui red basic cancel inverted button">
+            <i class="remove icon"></i>
+            Cancel
+          </div>
+          <div class="ui blue ok inverted button">
+            <i class="question mark icon"></i>
+            Pending
+          </div>
+        </div>
+      </div>
+      <div class="ui basic modal accept-run-modal">
+        <div class="ui icon header">
+          <i class="icon checkmark"></i>
+          Accept Submission
+        </div>
+        <div class="content">
+          <div class="ui warning message race-warning" style="display:none;">
+            <div class="header">Not all runners have accepted this race!</div>
+            <p>Please continue with caution!</p>
+          </div>
+          <h3>You are about to accept the following submission:</h3>
+          <p>Runner: <code class="runner"></code></p>
+          <p>Game: <code class="game"></code></p>
+          <p>Category: <code class="category"></code></p>
+          <p>Estimate: <code class="estimate"></code></p>
+          <h3>Do you have any additional comments?</h3>
+          <div class="ui form">
+            <textarea class="comments" rows="2" maxlength="250"></textarea>
+          </div>
+        </div>
+        <div class="actions">
+          <div class="ui red basic cancel inverted button">
+            <i class="remove icon"></i>
+            Cancel
+          </div>
+          <div class="ui green ok inverted button">
+            <i class="checkmark icon"></i>
+            Accept
+          </div>
+        </div>
+      </div>
+      <div class="ui basic modal reject-run-modal">
+        <div class="ui icon header">
+          <i class="icon ban"></i>
+          Reject Submission
+        </div>
+        <div class="content">
+          <h3>You are about to reject the following submission:</h3>
+          <p>Runner: <code class="runner"></code></p>
+          <p>Game: <code class="game"></code></p>
+          <p>Category: <code class="category"></code></p>
+          <p>Estimate: <code class="estimate"></code></p>
+          <h3>Do you have any additional comments?</h3>
+          <div class="ui form">
+            <textarea class="comments" rows="2" maxlength="250"></textarea>
+          </div>
+        </div>
+        <div class="actions">
+          <div class="ui red basic cancel inverted button">
+            <i class="remove icon"></i>
+            Cancel
+          </div>
+          <div class="ui red ok inverted button">
+            <i class="ban icon"></i>
+            Reject
+          </div>
+        </div>
+      </div>
+
+      <div class="ui basic modal edit-run-modal">
+        <div class="ui icon header">
+          <i class="icon wrench"></i>
+          Edit Submission
+        </div>
+        <div class="scrolling content">
+          <div class="ui form">
+            <h4 class="ui dividing header">Game Information</h4>
+            <div class="three fields">
+              <div class="required field ui search game-search">
+                <label>Game</label>
+                <div class="ui icon input">
+                  <input class="prompt" type="text" name="game" placeholder="Game name..." invalidname="game" maxlength="100">
+                  <i class="search icon"></i>
+                </div>
+                <div class="results"></div>
+              </div>
+              <div class="required field">
+                <label>Platform</label>
+                <input type="text" name="platform" placeholder="PC, N64, ..." invalidname="platform" maxlength="32">
+              </div>
+              <div class="required field">
+                <label>Region</label>
+                <input type="text" name="region" placeholder="NTSC, PAL, ..." invalidname="region" maxlength="32">
+              </div>
+            </div>
+            <div class="three fields">
+              <div class="required field">
+                <label>Category</label>
+                <input type="text" name="category" placeholder="Any%, 100%..." invalidname="category" maxlength="32">
+              </div>
+              <div class="required field">
+                <label>Estimate</label>
+                <input type="text" name="estimate" placeholder="00:30:00" invalidname="estimate">
+              </div>
+              <div class="required field">
+                <label>Video</label>
+                <input type="text" name="video" placeholder="http(s)://" invalidname="video">
+              </div>
+            </div>
+            <div class="two fields">
+              <div class="required field popup" data-title="Not correct?" data-content="You can set it manually!">
+                <label>Leaderboards</label>
+                <input type="text" name="leaderboards" placeholder="http(s)://" invalidname="leaderboards" maxlength="200">
+              </div>
+              <div class="required field popup" data-title="Not correct?" data-content="You can set it manually!">
+                <label>Twitch Game Name</label>
+                <input type="text" name="twitch-name" invalidname="twitch-name" maxlength="200">
+              </div>
+            </div>
+            <div class="ui hidden divider"></div>
+            <h4 class="ui dividing header">Availability</h4>
+            <div class="field">
+              <textarea class="availability-textarea" maxlength="750" rows="6" placeholder="Please tell us your estimate as to when you're available during the event..."></textarea>
+              <label class="chars-used">0/750</label>
+            </div>
+            <h4 class="ui dividing header">Donation Incentives / Bid Wars (Optional)</h4>
+            <div class="field">
+              <textarea class="incentives-textarea" maxlength="750" rows="6" placeholder="Donation incentives should not add much more than five minutes to your run/showcase."></textarea>
+              <label class="chars-used">0/750</label>
+            </div>
+            <h4 class="ui dividing header">Comments (Optional)</h4>
+            <div class="field">
+              <textarea class="comments-textarea" maxlength="750" rows="6" placeholder="Write additional information about your submission here..."></textarea>
+              <label class="chars-used">0/750</label>
+            </div>
+            <div class="ui error message">
+              <div class="header">An error has occured!</div>
+              <p><span class="error-message"></span></p>
+            </div>
+          </div>
+        </div>
+        <div class="actions">
+          <div class="ui red basic cancel inverted button">
+            <i class="remove icon"></i>
+            Cancel
+          </div>
+          <div class="ui blue ok inverted button">
+            <i class="wrench icon"></i>
+            Update
+          </div>
+        </div>
+      </div>
+
+      <div class="ui basic modal delete-run-modal">
+        <div class="ui icon header">
+          <i class="icon trash can"></i>
+          Delete Submission
+        </div>
+        <div class="content">
+          <h4>Are you sure you want to remove this submission?</h4>
+          <p><span class="game"></span> by <span class="username"></span></p>
+        </div>
+        <div class="actions">
+          <div class="ui red basic cancel inverted button">
+            <i class="remove icon"></i>
+            No
+          </div>
+          <div class="ui green ok inverted button">
+            <i class="checkmark icon"></i>
+            Yes
+          </div>
+        </div>
+      </div>
+
+      <div class="ui basic modal edit-reason-modal">
+        <div class="ui icon header">
+          <i class="icon wrench"></i>
+          Add/Edit Admin Comments
+        </div>
+        <div class="content">
+          <h4>Please enter the new Admin Comment below:</h4>
+          <div class="ui form">
+            <div class="ui required field">
+              <label>Reason</label>
+              <textarea class="reason-textarea" rows="8"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="actions">
+          <div class="ui red basic cancel inverted button">
+            <i class="remove icon"></i>
+            Cancel
+          </div>
+          <div class="ui blue ok inverted button edit-reason-button">
+            <i class="wrench icon"></i>
+            Update
+          </div>
+        </div>
+      </div>
+    </div>
+    {{> load-decode-content }}
+    {{> load-csrf }}
+    {{> decode-content var-name="data" data=submission_data }}
+    {{> decode-content var-name="eventData" data=eventData }}
+    {{> load-javascript src="admin/runs" }}
+  </body>
+
+  {{> submission/main view="admin" }}
+</html>

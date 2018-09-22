@@ -1,0 +1,51 @@
+@font-face {
+  font-family: "Icomoon-Custom";
+  src: url("../fonts/icomoon.ttf") format("truetype");
+}
+
+.icon-discord:before {
+  font-family: "Icomoon-Custom";
+  content: "\e900";
+}
+
+.to-show {
+  display: none !important;
+}
+
+.title .status.pending {
+  color: royalblue;
+}
+
+.title .status.accepted {
+  color: limegreen;
+}
+
+.title .status.rejected {
+  color: red;
+}
+
+.timepicker-fix {
+  top: unset !important;
+}
+
+.chars-used {
+  color: rgba(0,0,0,.87) !important;
+  float: right;
+  position: relative;
+  bottom: 18px;
+  right: 14px;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.race-info {
+  display: none;
+}
+
+.ui.input input {
+  padding: .67857143em 1em;
+}
+
+.game-info {
+  overflow-wrap: break-word;
+}

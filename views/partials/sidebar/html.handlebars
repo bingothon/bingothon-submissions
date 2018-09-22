@@ -1,0 +1,53 @@
+<aside class="ui left vertical menu sidebar">
+  {{#if profile}}
+  <div class="item">
+    <img class="ui avatar tiny image" src="{{profile.avatar}}">
+    <span>{{profile.displayName}}</span>
+  </div>
+  {{else}}
+  <a class="item" href="/auth/twitch"><i class="icon twitch"></i>Login with Twitch</a>
+  {{/if}}
+  <a class="item" href="/"><i class="icon home"></i>Home</a>
+  <div class="item">
+    Submissions
+    <div class="menu">
+      <a class="item" href="/submissions/view">View All<i class="icon list"></i></a>
+      {{#if profile}}
+      <a class="item" href="/submissions/submit">Submit<i class="icon edit"></i></a>
+      {{/if}}
+    </div>
+  </div>
+  {{#if profile}}
+  <div class="item">
+    User
+    <div class="menu">
+      <a class="item" href="/user/submissions">My Submissions<i class="icon list"></i></a>
+      <a class="item" href="/user/notifications">
+        My Notifications
+        {{#gt notificationCount 0}}
+        <div class="ui red small label">
+          <i class="icon mail"></i>{{notificationCount}}
+        </div>
+        {{/gt}}
+      </a>
+      <a class="item" href="/user/connections">My Connected Accounts<i class="icon list"></i></a>
+    </div>
+  </div>
+  {{/if}}
+  {{#gte profile.permissions 1}}
+    <div class="item">
+      Admin
+      <div class="menu">
+        {{#gte profile.permissions 2}}
+          <a class="item" href="/admin/runs">Runs<i class="icon list"></i></a>
+          {{#gte profile.permissions 3}}
+            <a class="item" href="/admin/settings">Settings<i class="icon settings"></i></a>
+          {{/gte}}
+        {{/gte}}
+      </div>
+    </div>
+  {{/gte}}
+  <a class="item dark-theme"><i class="icon toggle"></i>Dark Theme</a>
+  <a class="item" href="/about"><i class="icon question mark"></i>About</a>
+  {{#if profile}}<a class="item" href="/logout">Logout<i class="icon sign out"></i></a>{{/if}}
+</aside>

@@ -1,0 +1,1074 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Admin Setup</title>
+    <script src="/js/jquery-3.2.1.min.js" charset="utf-8"></script>
+    <script src="/sem/semantic.min.js" charset="utf-8"></script>
+    <script src="/js/jquery.datepair.min.js" charset="utf-8"></script>
+    <script src="/js/pikaday.js" charset="utf-8"></script>
+    <script src="/js/pikaday.jquery.js" charset="utf-8"></script>
+    <script src="/js/jquery.timepicker.min.js" charset="utf-8"></script>
+    <script src="/js/moment.js" charset="utf-8"></script>
+    <script src="/js/moment-timezone.js" charset="utf-8"></script>
+    <script src="/js/howler.min.js" charset="utf-8"></script>
+
+    <link rel="stylesheet" href="/sem/semantic.min.css">
+    <link class="dark-theme-css" rel="stylesheet" href="/sem/semantic.cyborg.min.css" disabled>
+    <link class="light-theme-fix-css" rel="stylesheet" href="/css/light-theme-fix.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/jquery.timepicker.css">
+    <link rel="stylesheet" href="/css/pikaday.css">
+
+    <script type="text/javascript">
+      function checkForMissingInputs (element) {
+        element = element || this;
+
+        let missingInputs = false;
+        $(element).find('input').each(function () {
+          if ($(this).val() === '') {
+            missingInputs = true;
+          }
+        });
+
+        if (missingInputs) {
+          $(element).find('.next').addClass('disabled');
+        } else {
+          $(element).find('.next').removeClass('disabled');
+        }
+      }
+
+      function authState (auth, user) {
+        if (auth.state === 'success') {
+          if (auth.type === 'twitch') {
+            $('.avatar[d-type="' + auth.type + '"]').attr('src', user.avatar);
+            $('.display-name[d-type="' + auth.type + '"]').html('<b>' + user.displayName + '</b>');
+          } else if (auth.type === 'discord') {
+            $('.avatar[d-type="' + auth.type + '"]').attr('src', user.avatar);
+            $('.display-name[d-type="' + auth.type + '"]').html('<b>' + user.username + '</b>#' + user.discriminator);
+          } else if (auth.type === 'twitter') {
+            $('.avatar[d-type="' + auth.type + '"]').attr('src', user.avatar);
+            $('.display-name[d-type="' + auth.type + '"]').html('<b>@' + user.username + '</b>');
+          } else if (auth.type === 'youtube') {
+            $('.avatar[d-type="' + auth.type + '"]').attr('src', user.avatar);
+            $('.display-name[d-type="' + auth.type + '"]').html('<b>' + user.displayName + '</b>');
+          }
+
+          $('.init-button[d-type="' + auth.type + '"]').removeClass('disabled loading');
+          let currentModal = Number($('.modal[d-type="' + auth.type + '"]').attr('modal-id'));
+          $('.modal[modal-id="' + (currentModal + 1) + '"]').modal({
+            onShow: checkForMissingInputs,
+            closable: false
+          }).modal('show');
+        } else {
+          $('.init-button[d-type="' + auth.type + '"]').removeClass('disabled loading');
+        }
+      }
+
+      $(function () {
+        $('.coupled.modal').modal({
+          allowMultiple: false,
+          closable: false
+        });
+
+        function setDarkTheme (on) {
+          localStorage.setItem('darkTheme', JSON.stringify(on));
+          $('.dark-theme-css').prop('disabled', !on);
+          $('.toggle-dark-mode').checkbox(on ? 'check' : 'uncheck');
+        }
+
+        let darkTheme = JSON.parse(localStorage.getItem('darkTheme'));
+        setDarkTheme(darkTheme);
+
+        $('.toggle-dark-mode').checkbox()
+        .checkbox({
+          onChecked: function () {
+            setDarkTheme(true);
+          },
+          onUnchecked: function () {
+            setDarkTheme(false);
+          }
+        });
+
+        let urlBase = document.URL.replace('/admin/setup', '/');
+        let clientData = {
+          twitch: {},
+          discord: {},
+          twitter: {},
+          youtube: {},
+
+          marathon: {}
+        };
+
+        $('.modal[modal-id="1"] input[name="server-url"]').val(urlBase);
+        $('.modal .redirect-uri').each(function () {
+          let type = $(this).attr('d-type');
+          $(this).text(urlBase + 'auth/' + type + '/callback/');
+        });
+        $(document).on('input', 'input[name="server-url"]', function () {
+          urlBase = $(this).val();
+          $('.modal .redirect-uri').each(function () {
+            let type = $(this).attr('d-type');
+            $(this).text(urlBase + 'auth/' + type + '/callback/');
+          });
+        });
+
+        $(document).on('click', '.modal button.init-button[setup="true"]', function (e) {
+          $(this).addClass('disabled loading');
+
+          let type = $(this).attr('d-type');
+          let authUrl = urlBase + 'auth/' + type + '/callback/';
+          window.open(authUrl, '_blank');
+        });
+
+        $('.modal button.init-button').not('[setup="true"]').click(function (e) {
+          let type = $(this).attr('d-type');
+          if (type === 'marathon') {
+            let timezone = clientData['marathon']['event-tz'];
+
+            let webhooks = {
+              public: clientData['marathon']['public-webhook'],
+              audit: clientData['marathon']['audit-webhook']
+            }
+
+            let data = {
+              _csrf: '{{csrfToken}}',
+              name: clientData['marathon']['name'],
+              timezone: timezone,
+              event_from: moment.tz(clientData['marathon']['event-from-d'] + ' ' + clientData['marathon']['event-from-t'], 'MM/DD/YYYY HH:mm', timezone).utc(),
+              event_to: moment.tz(clientData['marathon']['event-to-d'] + ' ' + clientData['marathon']['event-to-t'], 'MM/DD/YYYY HH:mm', timezone).utc(),
+              submissionLimit: clientData['marathon']['submission-limit'],
+              webhooks: webhooks
+            };
+
+            $.ajax({
+              type: 'POST',
+              url: '/api/setup/init/marathon',
+              data: JSON.stringify(data),
+              success: function () {
+                location.reload();
+              },
+              contentType: 'application/json',
+              dataType: 'text'
+            });
+          } else {
+            let data = {
+              _csrf: '{{csrfToken}}',
+              clientID: clientData[type]['client-id'],
+              clientSecret: clientData[type]['client-secret'],
+              serverURL: urlBase
+            };
+
+            if (type === 'twitch') {
+              data.setupPassword = $('.setup-password').val();
+
+              $.ajax({
+                type: 'POST',
+                url: '/api/setup/init/' + type,
+                data: JSON.stringify(data),
+                error: (data) => {
+                  $('.invalid-password-modal').modal({
+                    closable: false
+                  }).modal('show');
+                },
+                success: () => {
+                  $(this).removeClass('disabled loading');
+                  $(this).attr('setup', true);
+
+                  let innerText = $(this).find('.text');
+                  innerText.text(innerText.attr('alttext'));
+                },
+                contentType: 'application/json',
+                dataType: 'text'
+              });
+            } else {
+              $.ajax({
+                type: 'POST',
+                url: '/api/setup/init/' + type,
+                data: JSON.stringify(data),
+                success: () => {
+                  $(this).removeClass('disabled loading');
+                  $(this).attr('setup', true);
+
+                  let innerText = $(this).find('.text');
+                  innerText.text(innerText.attr('alttext'));
+                },
+                contentType: 'application/json',
+                dataType: 'text'
+              });
+            }
+          }
+
+          $(this).addClass('disabled loading');
+        });
+
+        $('.modal').each(function () {
+          let modalId = Number($(this).attr('modal-id'));
+          let previousButton = $('.modal[modal-id="' + modalId + '"] .previous');
+          if (previousButton.length) {
+            let previous = $('.modal[modal-id="' + (modalId - 1) + '"]');
+            if (previous.length) {
+              previous.modal({
+                onShow: checkForMissingInputs,
+                closable: false
+              }).modal('attach events', '.modal[modal-id="' + modalId + '"] .previous');
+            }
+          }
+
+          let nextButton = $('.modal[modal-id="' + modalId + '"] .next');
+          if (nextButton.length) {
+            let next = $('.modal[modal-id="' + (modalId + 1) + '"]');
+            if (next.length) {
+              next.modal({
+                onShow: checkForMissingInputs,
+                closable: false
+              }).modal('attach events', '.modal[modal-id="' + modalId + '"] .next');
+            }
+          }
+
+          let skipTo = Number($(this).attr('skip-to'));
+          if (!isNaN(skipTo)) {
+            let skip = $('.modal[modal-id="' + skipTo + '"]');
+            if (skip.length && $('.modal[modal-id="' + modalId + '"] .skip').length) {
+              skip.modal({
+                onShow: checkForMissingInputs,
+                closable: false
+              }).modal('attach events', '.modal[modal-id="' + modalId + '"] .skip');
+            }
+          }
+        });
+
+        function updateModalStuff (element, date) {
+          let type = $(element).attr('d-type');
+          let name = $(element).attr('name');
+          let val = date && date.format('MM/DD/YYYY') || $(element).val();
+
+          clientData[type][name] = val;
+
+          $('.modal[d-type="' + type + '"] .' + name).text(val);
+        }
+
+        $(document).on('input', 'input[linked]', function () {
+          updateModalStuff(this);
+        });
+
+        $(document).on('change', 'input[linked]', function () {
+          // Hacky fix for the timepicker...
+          if ($(this).hasClass('time')) {
+            $(this).parents('.fields').find('.time').each(function () {
+              updateModalStuff(this);
+            });
+            return;
+          }
+
+          updateModalStuff(this);
+        });
+
+        $(document).on('input', 'input', function () {
+          let modal = $(this).parents('.modal');
+
+          checkForMissingInputs(modal);
+        });
+        $(document).on('change', 'input', function () {
+          let modal = $(this).parents('.modal');
+
+          checkForMissingInputs(modal);
+        });
+
+        // Handle code-click
+        function selectElement(element) {
+          let sel = window.getSelection();
+          sel.removeAllRanges();
+          let range = document.createRange();
+          range.selectNodeContents(element);
+          sel.addRange(range);
+        }
+
+        $('code.selectable').on('click', function () {
+          selectElement(this.firstChild);
+        });
+
+        $('input.time').each(function () {
+          $(this).timepicker({
+            showDuration: true,
+            forceRoundTime: true,
+            step: 15,
+            disableTextInput: true,
+            timeFormat: 'H:i'
+          });
+        });
+
+        $('input[name="event-from-d"]').each(function () {
+          $(this).pikaday({
+            minDate: moment().toDate(),
+            onSelect: (date) => {
+              eventStartDate = date;
+              $('input[name="event-tz"]').parent().removeClass('disabled');
+              buildTimezoneSearch();
+
+              updateModalStuff(this, moment(date));
+            }
+          });
+        });
+
+        $('input.date').each(function () {
+          $(this).pikaday({
+            minDate: moment().toDate(),
+            onSelect: (date) => {
+              updateModalStuff(this, moment(date));
+            }
+          });
+        });
+
+        $('.event').datepair({
+          parseDate: function (input) {
+            var picker = $(input).data('pikaday');
+            return picker.getDate();
+          },
+          updateDate: function (input, dateObj) {
+            var picker = $(input).data('pikaday');
+            return picker.setDate(dateObj);
+          }
+        });
+
+        let eventStartDate = new Date(), selectedTimezone;
+        function buildTimezoneSearch () {
+          let content = [], timezones = moment.tz.names();
+          for(let i = 0; i < timezones.length; i++) {
+            let tz = moment.tz.zone(timezones[i]);
+            let offset = tz.offset(eventStartDate);
+            let utc = 'UTC' + (offset > 0 ? '-' : '+') + (Math.round(Math.abs(offset) / 60));
+            content.push({
+              title: tz.name + ' (' + tz.abbr(eventStartDate) + ' / ' + utc + ')',
+              name: tz.name
+            });
+          }
+
+          $('.ui.search').search({
+            source: content,
+            onSelect: function (result, response) {
+              selectedTimezone = result;
+              clientData['marathon']['event-tz'] = selectedTimezone.name;
+              $('.modal[d-type="marathon"] .event-tz').text(selectedTimezone.title);
+            }
+          }).search('clear cache');
+        }
+
+        let audio = new Howl({
+          src: '/audio/setup.ogg',
+          autoplay: true,
+          loop: true,
+          volume: 0.2
+        });
+
+        let currentVolume = 0.2;
+        let muted = false;
+        function toggleMusic () {
+          muted = !muted;
+          if (muted) {
+            audio.fade(audio.volume(), 0, 1000);
+          } else {
+            audio.fade(0, currentVolume, 1000);
+          }
+          $('.toggle-music i').removeClass('play pause').addClass(muted ? 'play' : 'pause');
+        }
+
+        function musicVolumeUp () {
+          currentVolume = Math.min(currentVolume + 0.1, 1.0);
+          audio.fade(audio.volume(), currentVolume, 500);
+        }
+
+        function musicVolumeDown () {
+          currentVolume = Math.max(currentVolume - 0.1, 0.1);
+          audio.fade(audio.volume(), currentVolume, 500);
+        }
+
+        $('.toggle-music').on('click', toggleMusic);
+        $('.music-volume-up').on('click', musicVolumeUp);
+        $('.music-volume-down').on('click', musicVolumeDown);
+
+        {{#not isSetup}}
+          {{#if connectionSetup.twitch}}
+            {{#if connectionSetup.discord}}
+              {{#if connectionSetup.twitter}}
+                {{#if connectionSetup.youtube}}
+                  $('.modal[modal-id="15"]').modal('show');
+                {{else}}
+                  $('.modal[modal-id="11"]').modal('show');
+                {{/if}}
+              {{else}}
+                $('.modal[modal-id="7"]').modal('show');
+              {{/if}}
+            {{else}}
+              $('.modal[modal-id="4"]').modal('show');
+            {{/if}}
+          {{else}}
+            $('.modal[modal-id="0"]').modal('show');
+          {{/if}}
+        {{/not}}
+      });
+    </script>
+  </head>
+  <body>
+    <!-- Invalid password modal -->
+    <div class="ui modal invalid-password-modal" modal-id="1001">
+      <div class="ui icon header">
+        <i class="icon ban"></i>
+        Invalid Password
+      </div>
+      <div class="content">
+        <div class="description">
+          <div class="ui header">Wow bud, seems like you aren't authorized!</div>
+          <p>The setup password you entered seems to be wrong! You might want to check that again.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Foreword & Server URL -->
+    <section>
+      <div class="ui coupled modal" modal-id="0">
+        <div class="header">
+          First Time Setup
+        </div>
+        <div class="content">
+          <div class="description">
+            <div class="ui header">Hey! Welcome to the Marathon Scheduler 9000™!</div>
+            <p>I'm gonna be guiding you through the first time setup process!</p>
+            <p>It'll contain setting up several OAuth handlers and the initial marathon details.</p>
+            <p>Before we can start though, I need you to enter the setup password you got from the server:</p>
+            <div class="ui one column grid">
+              <div class="column">
+                <div class="ui fluid input">
+                  <input class="setup-password" type="text" placeholder="Setup password">
+                </div>
+              </div>
+            </div>
+            <p></p>
+            <div class="ui toggle checkbox toggle-dark-mode">
+              <input type="checkbox">
+              <label>Dark Theme</label>
+            </div>
+          </div>
+        </div>
+        <div class="actions">
+          <div class="ui left floated icon buttons">
+            <div class="ui button toggle-music"><i class="icon pause"></i></div>
+            <div class="ui button music-volume-down"><i class="icon volume down"></i></div>
+            <div class="ui button music-volume-up"><i class="icon volume up"></i></div>
+          </div>
+          <div class="ui positive right labeled icon button next">
+            Continue
+            <i class="icon arrow right"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="ui coupled modal" modal-id="1">
+        <div class="header">
+          First Time Setup
+        </div>
+        <div class="content">
+          <div class="description">
+            <div class="ui header">Website / Server URL</div>
+            <p>First I need your website or server URL.</p>
+            <p>If you have a look at the address bar, you'll see the URL with <code>'/admin/setup'</code> at the end.</p>
+            <p>This means that if the address bar has the URL <code>'https://my.marathon.com/admin/setup'</code> the required URL is <code>'https://my.marathon.com/'</code>.</p>
+            <p><b>Don't forget the trailing slash!</b></p>
+            <p>I will put in an auto-guess for you, but I can't promise that it'll be correct.</p>
+            <div class="ui fluid input">
+              <input type="text" name="server-url" d-type="twitch" placeholder="https://my.marathon.com/">
+            </div>
+          </div>
+        </div>
+        <div class="actions">
+          <div class="ui left floated icon buttons">
+            <div class="ui button toggle-music"><i class="icon pause"></i></div>
+            <div class="ui button music-volume-down"><i class="icon volume down"></i></div>
+            <div class="ui button music-volume-up"><i class="icon volume up"></i></div>
+          </div>
+          <div class="ui negative left labeled icon button previous">
+            Back
+            <i class="icon arrow left"></i>
+          </div>
+          <div class="ui positive right labeled icon button next">
+            Continue
+            <i class="icon arrow right"></i>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Twitch -->
+    <section>
+      <div class="ui coupled modal" modal-id="2">
+        <div class="header">
+          First Time Setup
+        </div>
+        <div class="content">
+          <div class="description">
+            <div class="ui header">Twitch OAuth</div>
+            <p>First we need to get the Twitch OAuth setup so we I can add you as the organizer of this marathon.</p>
+            <p>You have to create a developer application on Twitch so you will get a Client ID and Client Secret.</p>
+            <p><a href="https://dev.twitch.tv/dashboard/apps" target="_blank">This link will forward you to your application dashboard.</a></p>
+            <p>In the <code>Redirect URI</code> field you'll have to put in the following:</p>
+            <p><code class="selectable redirect-uri" d-type="twitch"></code></p>
+            <p>Once you have the Client ID and Client Secret, please fill out the following fields for me:</p>
+            <div class="ui grid">
+              <div class="eight wide column">
+                <div class="ui fluid input">
+                  <input type="text" name="client-id" linked d-type="twitch" placeholder="Client ID">
+                </div>
+              </div>
+              <div class="eight wide column">
+                <div class="ui fluid input">
+                  <input type="text" name="client-secret" linked d-type="twitch" placeholder="Client Secret">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="actions">
+          <div class="ui left floated icon buttons">
+            <div class="ui button toggle-music"><i class="icon pause"></i></div>
+            <div class="ui button music-volume-down"><i class="icon volume down"></i></div>
+            <div class="ui button music-volume-up"><i class="icon volume up"></i></div>
+          </div>
+          <div class="ui negative left labeled icon button previous">
+            Back
+            <i class="icon arrow left"></i>
+          </div>
+          <div class="ui positive right labeled icon button next">
+            Continue
+            <i class="icon arrow right"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="ui coupled modal" modal-id="3" d-type="twitch">
+        <div class="header">
+          First Time Setup
+        </div>
+        <div class="content">
+          <div class="description">
+            <div class="ui header">Organizer Linking</div>
+            <p>Now that we have prepared the Client ID and Client Secret for the Twitch OAuth, we can link your organizer account.</p>
+            <p>Before we do that, please make sure your entered information is correct.</p>
+            <p><b>Redirect URI: </b><code class="redirect-uri" d-type="twitch"></code></p>
+            <p><b>Client ID: </b><code class="client-id" d-type="twitch"></code></p>
+            <p><b>Client Secret: </b><code class="client-secret" d-type="twitch"></code></p>
+            <p>If the information is correct, please link your Twitch account with a click on the button.</p>
+          </div>
+        </div>
+        <div class="actions">
+          <div class="ui left floated icon buttons">
+            <div class="ui button toggle-music"><i class="icon pause"></i></div>
+            <div class="ui button music-volume-down"><i class="icon volume down"></i></div>
+            <div class="ui button music-volume-up"><i class="icon volume up"></i></div>
+          </div>
+          <div class="ui negative left labeled icon button previous">
+            Back
+            <i class="icon arrow left"></i>
+          </div>
+          <button class="ui violet right labeled icon button init-button" d-type="twitch">
+            <span class="text" alttext="Link with Twitch">Setup Twitch</span>
+            <i class="icon twitch"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="ui coupled modal" modal-id="4">
+        <div class="header">
+          First Time Setup
+        </div>
+        <div class="content">
+          <div class="description">
+            <div class="ui header">Twitch Linking Successful</div>
+            <p>Hey, welcome back, <img class="ui avatar image" d-type="twitch" src="{{profile.avatar}}"><span class="display-name" d-type="twitch"><b>{{profile.displayName}}</b></span>! Seems like linking your Twitch worked!</p>
+            <p>We're not done yet though, hit that <code>Continue</code> button so we can move on!</p>
+          </div>
+        </div>
+        <div class="actions">
+          <div class="ui left floated icon buttons">
+            <div class="ui button toggle-music"><i class="icon pause"></i></div>
+            <div class="ui button music-volume-down"><i class="icon volume down"></i></div>
+            <div class="ui button music-volume-up"><i class="icon volume up"></i></div>
+          </div>
+          <div class="ui positive right labeled icon button next">
+            Continue
+            <i class="icon arrow right"></i>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Discord -->
+    <section>
+      <div class="ui coupled modal" modal-id="5">
+        <div class="header">
+          First Time Setup
+        </div>
+        <div class="content">
+          <div class="description">
+            <div class="ui header">Discord OAuth</div>
+            <p>Next up we need to get the Discord OAuth to work!</p>
+            <p>As with Twitch, you'll have to create a developer application so you will get a Client ID and Client Secret.</p>
+            <p><a href="https://discordapp.com/developers/applications/me" target="_blank">This link will forward you to the "My Apps" page on Discord's website.</a></p>
+            <p>In the <code>Redirect URI</code> field you'll have to put in the following:</p>
+            <p><code class="selectable redirect-uri" d-type="discord"></code></p>
+            <p>Once you have the Client ID and Client Secret, please fill out the following fields for me:</p>
+            <div class="ui grid">
+              <div class="eight wide column">
+                <div class="ui fluid input">
+                  <input type="text" name="client-id" linked d-type="discord" placeholder="Client ID">
+                </div>
+              </div>
+              <div class="eight wide column">
+                <div class="ui fluid input">
+                  <input type="text" name="client-secret" linked d-type="discord" placeholder="Client Secret">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="actions">
+          <div class="ui left floated icon buttons">
+            <div class="ui button toggle-music"><i class="icon pause"></i></div>
+            <div class="ui button music-volume-down"><i class="icon volume down"></i></div>
+            <div class="ui button music-volume-up"><i class="icon volume up"></i></div>
+          </div>
+          <div class="ui positive right labeled icon button next">
+            Continue
+            <i class="icon arrow right"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="ui coupled modal" modal-id="6" d-type="discord">
+        <div class="header">
+          First Time Setup
+        </div>
+        <div class="content">
+          <div class="description">
+            <div class="ui header">Organizer Linking (Discord)</div>
+            <p>Now that we have prepared the Client ID and Client Secret for the Discord OAuth, we can link a Discord account to your organizer account.</p>
+            <p>Before we do that, please make sure your entered information is correct.</p>
+            <p><b>Redirect URI: </b><code class="redirect-uri" d-type="discord"></code></p>
+            <p><b>Client ID: </b><code class="client-id" d-type="discord"></code></p>
+            <p><b>Client Secret: </b><code class="client-secret" d-type="discord"></code></p>
+            <p>If the information is correct, please link your Discord account with a click on the button.</p>
+          </div>
+        </div>
+        <div class="actions">
+          <div class="ui left floated icon buttons">
+            <div class="ui button toggle-music"><i class="icon pause"></i></div>
+            <div class="ui button music-volume-down"><i class="icon volume down"></i></div>
+            <div class="ui button music-volume-up"><i class="icon volume up"></i></div>
+          </div>
+          <div class="ui negative left labeled icon button previous">
+            Back
+            <i class="icon arrow left"></i>
+          </div>
+          <button class="ui blue right labeled icon button init-button" d-type="discord">
+            <span class="text" alttext="Link with Discord">Setup Discord</span>
+            <i class="icon icon-discord"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="ui coupled modal" modal-id="7">
+        <div class="header">
+          First Time Setup
+        </div>
+        <div class="content">
+          <div class="description">
+            <div class="ui header">Discord Linking Successful</div>
+            <p>Hey, welcome back again, <img class="ui avatar image" d-type="discord" src="{{profile.connections.discord.avatar}}"><span class="display-name" d-type="discord"><b>{{profile.connections.discord.username}}</b>#{{profile.connections.discord.discriminator}}</span>! Seems like linking your Discord worked, too!</p>
+            <p>We're not done yet though, hit that <code>Continue</code> button so we can move on!</p>
+          </div>
+        </div>
+        <div class="actions">
+          <div class="ui left floated icon buttons">
+            <div class="ui button toggle-music"><i class="icon pause"></i></div>
+            <div class="ui button music-volume-down"><i class="icon volume down"></i></div>
+            <div class="ui button music-volume-up"><i class="icon volume up"></i></div>
+          </div>
+          <div class="ui positive right labeled icon button next">
+            Continue
+            <i class="icon arrow right"></i>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Twitter -->
+    <section>
+      <div class="ui coupled modal" modal-id="8" skip-to="12">
+        <div class="header">
+          First Time Setup
+        </div>
+        <div class="content">
+          <div class="description">
+            <div class="ui header">Optional: Twitter OAuth</div>
+            <p>You can now setup Twitter OAuth if you want to so a user can link their Twitter account to their profile.</p>
+            <p><b>If you do not do this step now you have to redo the setup again at a later point!</b></p>
+          </div>
+        </div>
+        <div class="actions">
+          <div class="ui left floated icon buttons">
+            <div class="ui button toggle-music"><i class="icon pause"></i></div>
+            <div class="ui button music-volume-down"><i class="icon volume down"></i></div>
+            <div class="ui button music-volume-up"><i class="icon volume up"></i></div>
+          </div>
+          <div class="ui blue left button skip">
+            Skip
+          </div>
+          <div class="ui positive right labeled icon button next">
+            Continue
+            <i class="icon arrow right"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="ui coupled modal" modal-id="9">
+        <div class="header">
+          First Time Setup
+        </div>
+        <div class="content">
+          <div class="description">
+            <div class="ui header">Twitter OAuth</div>
+            <p>Alright, now we'll get the Twitter OAuth to work!</p>
+            <p>As with Twitch and Discord, you'll have to create a developer application so you will get a Client ID and Client Secret.</p>
+            <p><a href="https://apps.twitter.com/" target="_blank">This link will forward you to the "My Apps" page on Twitter.</a></p>
+            <p>In the <code>Callback URL</code> field you'll have to put in the following:</p>
+            <p><code class="selectable redirect-uri" d-type="twitter"></code></p>
+            <p>Once you have the Consumer Key (API Key) and Consumer Secret (API Secret), please fill out the following fields for me:</p>
+            <div class="ui grid">
+              <div class="eight wide column">
+                <div class="ui fluid input">
+                  <input type="text" name="client-id" linked d-type="twitter" placeholder="Consumer Key (API Key)">
+                </div>
+              </div>
+              <div class="eight wide column">
+                <div class="ui fluid input">
+                  <input type="text" name="client-secret" linked d-type="twitter" placeholder="Consumer Secret (API Secret)">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="actions">
+          <div class="ui left floated icon buttons">
+            <div class="ui button toggle-music"><i class="icon pause"></i></div>
+            <div class="ui button music-volume-down"><i class="icon volume down"></i></div>
+            <div class="ui button music-volume-up"><i class="icon volume up"></i></div>
+          </div>
+          <div class="ui positive right labeled icon button next">
+            Continue
+            <i class="icon arrow right"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="ui coupled modal" modal-id="10" d-type="twitter">
+        <div class="header">
+          First Time Setup
+        </div>
+        <div class="content">
+          <div class="description">
+            <div class="ui header">Organizer Linking (Twitter)</div>
+            <p>Now that we have prepared the Client ID and Client Secret for the Twitter OAuth, we can link a Twitter account to your organizer account.</p>
+            <p>Before we do that, please make sure your entered information is correct.</p>
+            <p><b>Callback URL: </b><code class="redirect-uri" d-type="twitter"></code></p>
+            <p><b>Consumer Key (API Key): </b><code class="client-id" d-type="twitter"></code></p>
+            <p><b>Consumer Secret (API Secret): </b><code class="client-secret" d-type="twitter"></code></p>
+            <p>If the information is correct, please link your Twitter account with a click on the button.</p>
+          </div>
+        </div>
+        <div class="actions">
+          <div class="ui left floated icon buttons">
+            <div class="ui button toggle-music"><i class="icon pause"></i></div>
+            <div class="ui button music-volume-down"><i class="icon volume down"></i></div>
+            <div class="ui button music-volume-up"><i class="icon volume up"></i></div>
+          </div>
+          <div class="ui negative left labeled icon button previous">
+            Back
+            <i class="icon arrow left"></i>
+          </div>
+          <button class="ui blue right labeled icon button init-button" d-type="twitter">
+            <span class="text" alttext="Link with Twitter">Setup Twitter</span>
+            <i class="icon twitter"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="ui coupled modal" modal-id="11">
+        <div class="header">
+          First Time Setup
+        </div>
+        <div class="content">
+          <div class="description">
+            <div class="ui header">Twitter Linking Successful</div>
+            <p>Oh hi! I almost didn't see you there, <img class="ui avatar image" d-type="twitter" src="{{profile.connections.twitter.avatar}}"><span class="display-name" d-type="twitter"><b>@{{profile.connections.twitter.username}}</b></span>! Seems like linking your Twitter worked just like the rest so far!</p>
+            <p>We're not done yet though, hit that <code>Continue</code> button so we can move on!</p>
+          </div>
+        </div>
+        <div class="actions">
+          <div class="ui left floated icon buttons">
+            <div class="ui button toggle-music"><i class="icon pause"></i></div>
+            <div class="ui button music-volume-down"><i class="icon volume down"></i></div>
+            <div class="ui button music-volume-up"><i class="icon volume up"></i></div>
+          </div>
+          <div class="ui positive right labeled icon button next">
+            Continue
+            <i class="icon arrow right"></i>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- YouTube -->
+    <section>
+      <div class="ui coupled modal" modal-id="12" skip-to="16">
+        <div class="header">
+          First Time Setup
+        </div>
+        <div class="content">
+          <div class="description">
+            <div class="ui header">Optional: YouTube OAuth</div>
+            <p>You can now setup YouTube OAuth if you want to so a user can link their YouTube account to their profile.</p>
+            <p><b>If you do not do this step now you have to redo the setup again at a later point!</b></p>
+          </div>
+        </div>
+        <div class="actions">
+          <div class="ui left floated icon buttons">
+            <div class="ui button toggle-music"><i class="icon pause"></i></div>
+            <div class="ui button music-volume-down"><i class="icon volume down"></i></div>
+            <div class="ui button music-volume-up"><i class="icon volume up"></i></div>
+          </div>
+          <div class="ui blue left button skip">
+            Skip
+          </div>
+          <div class="ui positive right labeled icon button next">
+            Continue
+            <i class="icon arrow right"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="ui coupled modal" modal-id="13">
+        <div class="header">
+          First Time Setup
+        </div>
+        <div class="content">
+          <div class="description">
+            <div class="ui header">YouTube OAuth</div>
+            <p>Last but not least we're gonna get the YouTube OAuth to work!</p>
+            <p>You know the drill by now.<code>Redirect URI</code>, <code>Client ID</code> and <code>Client Secret</code>.</p>
+            <p><a href="https://console.developers.google.com/apis/credentials" target="_blank">This link will forward you to the "Google APIs" page on... Google.</a></p>
+            <p>In the <code>Authorised redirect URIs</code> field you'll have to put in the following:</p>
+            <p><code class="selectable redirect-uri" d-type="youtube"></code></p>
+            <p>Once you have the <code>Client ID</code> and <code>Client Secret</code>, please fill out the following fields for me:</p>
+            <div class="ui grid">
+              <div class="eight wide column">
+                <div class="ui fluid input">
+                  <input type="text" name="client-id" linked d-type="youtube" placeholder="Client ID">
+                </div>
+              </div>
+              <div class="eight wide column">
+                <div class="ui fluid input">
+                  <input type="text" name="client-secret" linked d-type="youtube" placeholder="Client Secret">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="actions">
+          <div class="ui left floated icon buttons">
+            <div class="ui button toggle-music"><i class="icon pause"></i></div>
+            <div class="ui button music-volume-down"><i class="icon volume down"></i></div>
+            <div class="ui button music-volume-up"><i class="icon volume up"></i></div>
+          </div>
+          <div class="ui positive right labeled icon button next">
+            Continue
+            <i class="icon arrow right"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="ui coupled modal" modal-id="14" d-type="youtube">
+        <div class="header">
+          First Time Setup
+        </div>
+        <div class="content">
+          <div class="description">
+            <div class="ui header">Organizer Linking (YouTube)</div>
+            <p>Now that we have prepared the Client ID for the YouTube OAuth, we can link a YouTube account to your organizer account.</p>
+            <p>Before we do that, please make sure your entered information is correct.</p>
+            <p><b>Redirect URI: </b><code class="redirect-uri" d-type="youtube"></code></p>
+            <p><b>Client ID: </b><code class="client-id" d-type="youtube"></code></p>
+            <p><b>Client Secret: </b><code class="client-secret" d-type="youtube"></code></p>
+            <p>If the information is correct, please link your YouTube account with a click on the button.</p>
+          </div>
+        </div>
+        <div class="actions">
+          <div class="ui left floated icon buttons">
+            <div class="ui button toggle-music"><i class="icon pause"></i></div>
+            <div class="ui button music-volume-down"><i class="icon volume down"></i></div>
+            <div class="ui button music-volume-up"><i class="icon volume up"></i></div>
+          </div>
+          <div class="ui negative left labeled icon button previous">
+            Back
+            <i class="icon arrow left"></i>
+          </div>
+          <button class="ui red right labeled icon button init-button" d-type="youtube">
+            <span class="text" alttext="Link with YouTube">Setup YouTube</span>
+            <i class="icon youtube"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="ui coupled modal" modal-id="15">
+        <div class="header">
+          First Time Setup
+        </div>
+        <div class="content">
+          <div class="description">
+            <div class="ui header">YouTube Linking Successful</div>
+            <p>Glad you made it, <img class="ui avatar image" d-type="youtube" src="{{profile.connections.youtube.avatar}}"><span class="display-name" d-type="youtube"><b>{{profile.connections.youtube.displayName}}</b></span>! You even managed to pass the final hurdle by linking your YouTube account successfully!</p>
+            <p>We're not done yet though, hit that <code>Continue</code> button one last time so we can move on!</p>
+          </div>
+        </div>
+        <div class="actions">
+          <div class="ui left floated icon buttons">
+            <div class="ui button toggle-music"><i class="icon pause"></i></div>
+            <div class="ui button music-volume-down"><i class="icon volume down"></i></div>
+            <div class="ui button music-volume-up"><i class="icon volume up"></i></div>
+          </div>
+          <div class="ui positive right labeled icon button next">
+            Continue
+            <i class="icon arrow right"></i>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Marathon settings -->
+    <section>
+      <div class="ui coupled modal" modal-id="16">
+        <div class="header">
+          First Time Setup
+        </div>
+        <div class="content">
+          <div class="description">
+            <div class="ui header">Marathon Settings</div>
+            <p>Alright! We've got all services linked which means the only thing that remains are the actual marathon settings!</p>
+            <p>Don't worry, you can change these settings in the admin interface once the setup is completed if you want to.</p>
+            <div class="ui form">
+              <div class="field">
+                <label>Marathon Name</label>
+                <input type="text" name="name" linked d-type="marathon">
+              </div>
+              <h4 class="ui dividing header">Marathon Dates</h4>
+              <div class="inline fields event">
+                <div class="ui grid">
+                  <div class="two wide middle aligned center aligned column">
+                    <label>From</label>
+                  </div>
+                  <div class="six wide column">
+                    <div class="field">
+                      <input type="text" name="event-from-d" linked d-type="marathon" class="date start">
+                    </div>
+                    <div class="field">
+                      <input type="text" name="event-from-t" linked d-type="marathon" class="time">
+                    </div>
+                  </div>
+                  <div class="middle aligned center aligned column">
+                    <label>To</label>
+                  </div>
+                  <div class="six wide column">
+                    <div class="field">
+                      <input type="text" name="event-to-d" linked d-type="marathon" class="date end">
+                    </div>
+                    <div class="field">
+                      <input type="text" name="event-to-t" linked d-type="marathon" class="time">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="field">
+                <label>Timezone</label>
+                <div class="ui search">
+                  <div class="ui input disabled">
+                    <input class="prompt" type="text" name="event-tz" linked d-type="marathon" placeholder="Search timezones...">
+                  </div>
+                  <div class="results"></div>
+                </div>
+              </div>
+              <div class="field">
+                <label>Submission limit per user</label>
+                <input type="number" name="submission-limit" linked d-type="marathon" placeholder="5">
+              </div>
+              <h4 class="ui dividing header">Discord Webhooks</h4>
+              <div class="field">
+                <label>Public Webhook</label>
+                <input type="text" name="public-webhook" linked d-type="marathon" placeholder="https://">
+              </div>
+              <div class="field">
+                <label>Audit Webhook</label>
+                <input type="text" name="audit-webhook" linked d-type="marathon" placeholder="https://">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="actions">
+          <div class="ui left floated icon buttons">
+            <div class="ui button toggle-music"><i class="icon pause"></i></div>
+            <div class="ui button music-volume-down"><i class="icon volume down"></i></div>
+            <div class="ui button music-volume-up"><i class="icon volume up"></i></div>
+          </div>
+          <div class="ui positive right labeled icon button next">
+            Continue
+            <i class="icon arrow right"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="ui coupled modal" modal-id="17" d-type="marathon">
+        <div class="header">
+          First Time Setup
+        </div>
+        <div class="content">
+          <div class="description">
+            <div class="ui header">Marathon Settings (Confirmation)</div>
+            <p></p>
+            <p>Great! Now, these are the settings you have chosen for the marathon:</p>
+            <p><b>Marathon Name: </b><code class="name" d-type="marathon"></code></p>
+            <p><b>Event Start: </b><code class="event-from-d" d-type="marathon"></code>, <code class="event-from-t"></code></p>
+            <p><b>Event End: </b><code class="event-to-d" d-type="marathon"></code>, <code class="event-to-t"></code></p>
+            <p><b>Event Timezone: </b><code class="event-tz" d-type="marathon"></code></p>
+            <p><b>Submission limit per user: </b><code class="submission-limit" d-type="marathon"></code></p>
+            <p><b>Discord Public Webhook URL: </b><code class="public-webhook" d-type="marathon" style="overflow-wrap: break-word;"></code></p>
+            <p><b>Discord Audit Webhook URL: </b><code class="audit-webhook" d-type="marathon" style="overflow-wrap: break-word;"></code></p>
+            <p>If you think this information is correct then please click on the <code>Finalize</code> button.</p>
+            <p>Once again, you can change this information any time in the admin panel if you have to.</p>
+          </div>
+        </div>
+        <div class="actions">
+          <div class="ui left floated icon buttons">
+            <div class="ui button toggle-music"><i class="icon pause"></i></div>
+            <div class="ui button music-volume-down"><i class="icon volume down"></i></div>
+            <div class="ui button music-volume-up"><i class="icon volume up"></i></div>
+          </div>
+          <div class="ui negative left labeled icon button previous">
+            Back
+            <i class="icon arrow left"></i>
+          </div>
+          <button class="ui blue right labeled icon button init-button" d-type="marathon">
+            Finalize
+            <i class="icon checkmark"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>
