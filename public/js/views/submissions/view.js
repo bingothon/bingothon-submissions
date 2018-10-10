@@ -19,7 +19,7 @@ $(function () {
 
       let html = _s.isRace ? $('#submission-race-template').html() : $('#submission-template').html();
       html = html.replace(/##uuid##/g, uuid);
-      if (_u.displayName.toLowerCase() === _u.speedrunComUser.toLowerCase()) html = html.replace(/##runner-name##/g, _u.displayName);
+      if (_u.displayName.toLowerCase() === _u.speedrunComUser.toLowerCase() || !_u.speedrunComUser) html = html.replace(/##runner-name##/g, _u.displayName);
       else html = html.replace(/##runner-name##/g, `${_u.displayName} (${_u.speedrunComUser})`);
       html = html.replace(/##twitch##/g, _u.username);
       html = html.replace(/##display-name##/g, _u.displayName);

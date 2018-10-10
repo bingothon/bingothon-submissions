@@ -217,11 +217,11 @@ $(function () {
     });
   }
 
-  if (!srComUsername) {
-    $('.dimmer').dimmer({
-      closable: false,
-    }).dimmer('show');
-  }
+  // if (!srComUsername) {
+  //   $('.dimmer').dimmer({
+  //     closable: false,
+  //   }).dimmer('show');
+  // }
 
   if (!discordUsername) {
     $('.dimmer').dimmer({

@@ -11,10 +11,10 @@ module.exports = {
 
     let eventSubmissionState = await database.event.getSubmissionState();
     if (req.user && req.user.connections.discord.username && eventSubmissionState === 1) {
-      if (!(await database.user.hasSpeedrunComUser(req.user.id))) {
-        res.status(422).json({ msg: 'No SR.com username connected to this user!' });
-        return;
-      }
+      // if (!(await database.user.hasSpeedrunComUser(req.user.id))) {
+      //   res.status(422).json({ msg: 'No SR.com username connected to this user!' });
+      //   return;
+      // }
 
       delete req.body['_csrf'];
 
