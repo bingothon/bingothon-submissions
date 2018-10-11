@@ -18,6 +18,8 @@ $(function () {
   $('.event-to').attr('data-tooltip', event_to_user.format('LLLL') + ' (Your timezone / ' + event_from_user.format('UTC Z') + ')');
   $('.submission-limit').text(eventData.submissionLimit);
 
-  let converter = new showdown.Converter();
+  let converter = new showdown.Converter({
+    openLinksInNewWindow: true
+  });
   $('.markdown-content').html(converter.makeHtml(eventData.info));
 });
