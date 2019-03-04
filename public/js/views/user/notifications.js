@@ -17,7 +17,6 @@ function postTo(url, data, successCallback) {
 
 $(function () {
   let converter = new showdown.Converter({
-    openLinksInNewWindow: true,
     simpleLineBreaks: true
   });
 

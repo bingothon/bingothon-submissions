@@ -48,10 +48,9 @@ function initRest () {
   }
 }
 
-const port = 3000;
-const host = 'localhost';
-app.listen(port, host, function () {
-  console.log(`Started listening on port ${host}:${port}`);
+const port = 8092;
+app.listen(port, function () {
+  console.log(`Started listening on port :${port}`);
 
   console.log('Starting rest initialization after 1 second...');
 

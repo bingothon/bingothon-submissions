@@ -15,6 +15,8 @@ let setupGet = function (router) {
     } else {
       req.data.eventData = Utils.safeJSON(await database.event.getData());
       res.render('index', req.data);
+      res.header("Access-Control-Allow-Origin", "https://dev.bingothon.com");
+      res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     }
   });
 

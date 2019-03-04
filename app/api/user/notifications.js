@@ -8,7 +8,6 @@ module.exports = {
       if (req.user.id === notification.userID) {
         database.notification.setRead(req.params.uuid);
         res.status(200).end();
-        return;
       }
     }
     res.end();
@@ -21,7 +20,6 @@ module.exports = {
       if (req.user.id === notification.userID) {
         database.notification.setExecuted(req.params.uuid);
         res.status(200).end();
-        return;
       }
     }
     res.end();
@@ -34,7 +32,6 @@ module.exports = {
       if (req.user.id === notification.userID) {
         database.notification.remove(req.params.uuid);
         res.status(200).end();
-        return;
       }
     }
     res.end();

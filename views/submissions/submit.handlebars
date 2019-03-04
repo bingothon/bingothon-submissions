@@ -19,7 +19,6 @@
     <link rel="stylesheet" href="/css/submissions/submit.css">
     <link rel="stylesheet" href="/css/jquery.timepicker.css">
     <link rel="stylesheet" href="/css/pikaday.css">
-    <link rel="shortcut icon" type="image/png" href="/image/favicon.ico"/>
 
     {{> sidebar/js}}
   </head>
@@ -32,19 +31,19 @@
 
       <div class="ui container">
         <div class="ui hidden divider"></div>
-        <!--<div class="ui" {{#if profile.speedrunComUser}} style="display: none;" {{/if}}>-->
-          <!--<div class="ui warning message">-->
-            <!--<div class="header">No Speedrun.com username set!</div>-->
-            <!--<p>You cannot submit runs unless you have set your Speedrun.com username in your connections page!</p>-->
-            <!--<a href="/user/connections">Click here to go to your connections page!</a>-->
-          <!--</div>-->
-          <!--<div class="ui hidden divider"></div>-->
-        <!--</div>-->
+        <div class="ui" {{#if profile.speedrunComUser}} style="display: none;" {{/if}}>
+          <div class="ui warning message">
+            <div class="header">No Speedrun.com username set!</div>
+            <p>You cannot submit runs unless you have set your Speedrun.com username in your connections page!</p>
+            <a href="/user/connections">Click here to go to your connections page!</a>
+          </div>
+          <div class="ui hidden divider"></div>
+        </div>
         <div class="ui" {{#if profile.connections.discord.username}} style="display: none;" {{/if}}>
           <div class="ui warning message">
             <div class="header">Discord not linked to your Account!</div>
             <p>Discord is the main tool for all forms of communication leading up to the main event and will also be the way for the game selection and scheduling team to contact you.</p>
-            <p>If you don't have an account yet, please get one <a href="https://discordapp.com/" target="_blank">here</a> and join our <a href="http://discord.powerupwithpride.org" target="_blank">Discord Server.</a></p>
+            <p>If you don't have an account yet, please get one <a href="https://discordapp.com/" target="_blank">here</a> and join our <a href="UPDATE_THIS_URL" target="_blank">Discord Server.</a></p>
             <div class="ui hidden divider"></div>
             <a href="/user/connections">Click here to go to your connections page!</a>
           </div>
@@ -112,7 +111,6 @@
                 </div>
                 <div class="ui hidden divider"></div>
                 <h4 class="ui left floated header">Availability</h4>
-                <h4 class="ui right floated header"></h4>
                 <div class="ui hidden divider"></div>
                 <h4 class="ui dividing header"></h4>
                 <div class="{{#unless profile.connections.discord.username}}disabled {{/unless}}field">

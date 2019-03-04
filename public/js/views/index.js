@@ -1,5 +1,5 @@
 // eventData = {{eventData}}
-
+document.domain = "bingothon.com";
 $(function () {
   let event_from_local = moment.tz(eventData.event_from, eventData.timezone);
   let event_from_user = moment(eventData.event_from);
@@ -18,8 +18,6 @@ $(function () {
   $('.event-to').attr('data-tooltip', event_to_user.format('LLLL') + ' (Your timezone / ' + event_from_user.format('UTC Z') + ')');
   $('.submission-limit').text(eventData.submissionLimit);
 
-  let converter = new showdown.Converter({
-    openLinksInNewWindow: true
-  });
+  let converter = new showdown.Converter();
   $('.markdown-content').html(converter.makeHtml(eventData.info));
 });

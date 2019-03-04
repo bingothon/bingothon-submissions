@@ -25,8 +25,6 @@ class SubmissionDatabase extends AbstractDatabase {
   }
 
   fixString (string) {
-    if (string.includes('http:') || string.includes('https:')) return string;
-
 	string = string.replace(/_/g, '\\_');
 	string = string.replace(/\*/g, '\\*');
 	string = string.replace(/~/g, '\\~');

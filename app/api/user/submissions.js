@@ -11,10 +11,10 @@ module.exports = {
 
     let eventSubmissionState = await database.event.getSubmissionState();
     if (req.user && req.user.connections.discord.username && eventSubmissionState === 1) {
-      // if (!(await database.user.hasSpeedrunComUser(req.user.id))) {
-      //   res.status(422).json({ msg: 'No SR.com username connected to this user!' });
-      //   return;
-      // }
+      if (!(await database.user.hasSpeedrunComUser(req.user.id))) {
+        res.status(422).json({ msg: 'No SR.com username connected to this user!' });
+        return;
+      }
 
       delete req.body['_csrf'];
 
@@ -37,7 +37,6 @@ module.exports = {
         delete req.body['_csrf'];
         database.submission.update(req.params.uuid, req.body);
         res.status(200).end();
-        return;
       }
     }
     res.end();
@@ -54,7 +53,6 @@ module.exports = {
       if (submission && req.user.id === submission.userID && submission.state === 0) {
         database.submission.remove(req.params.uuid);
         res.status(200).end();
-        return;
       }
     }
     res.end();
@@ -67,7 +65,6 @@ module.exports = {
       if (req.user.id in submission.runners) {
         database.submission.decideRace(req.params.uuid, req.user.id, req.body.accepted);
         res.status(200).end();
-        return;
       }
     }
     res.end();
