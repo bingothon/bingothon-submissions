@@ -48,7 +48,7 @@ function initRest () {
   }
 }
 
-const port = 3000;
+const port = 8092;
 const host = 'localhost';
 app.listen(port, host, function () {
   console.log(`Started listening on port ${host}:${port}`);
