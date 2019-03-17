@@ -18,19 +18,23 @@
 
   </head>
   <body class="pushable">
-    <div class="nav">
-        <ul class="menu">
-            <li><a href="https://dev.bingothon.com/"><img class="home-button" src="../image/logo.jpg"/></a></li>
-            <li><a href="https://dev.bingothon.com/news.html">News</a></li>
-            <li><a href="https://dev.bingothon.com/schedule.html">Schedule</a></li>
-            <li><a href="https://devsubmissions.bingothon.com">Submissions</a></li>
-            <li><a href="https://devdonations.bingothon.com">Donate</a></li>
-            <li><a href="https://discord.bingothon.com">Socials</a></li>
-            <li><a href="https://dev.bingothon.com/staff.html">Staff</a></li>
-            <li><a href="https://twitch.tv/speedrunslive">Twitch</a></li>
-            <li><a href="https://dev.bingothon.com/privacypolicy.html">Privacy Policy</a></li>
-        </ul>
-    </div>
+    <header class="header">
+	  <a href="https://bingothon.com/" class="logo"><img class="home-button" src="https://bingothon.com/pictures/logo.jpg"/></a>
+	  <input class="menu-btn" type="checkbox" id="menu-btn" />
+	  <label class="menu-icon" for="menu-btn"><span class="navicon"></span></label>
+	  <ul class="menu">
+	    <li><a href="news.html">News</a></li>
+	        <li><a href="schedule.html">Schedule</a></li>
+	        <li><a href="https://devsubmissions.bingothon.com">Submissions</a></li>
+	        <li><a href="https://devdonations.bingothon.com">Donate</a></li>
+	        <li><a href="about.html">What is Bingothon?</a></li>
+	        <li><a href="privacypolicy.html">Privacy Policy</a></li>
+	        <li><a class="imagebutton" href="https://twitch.tv/speedrunslive"><img class="home-button" src="https://bingothon.com/pictures/twitch-social.png"/></a></li>
+	        <li><a class="imagebutton" href="https://discord.bingothon.com"><img class="home-button" src="https://bingothon.com/pictures/discord-social.png"/></a></li>
+	        <li><a class="imagebutton" href="https://twitter.com/bingothon"><img class="home-button" src="https://bingothon.com/pictures/twitter-social.png"/></a></li>
+	        <li><a class="imagebutton" href="https://www.youtube.com/channel/UCmKotiVBr3-Ek3UPTqT7bow"><img class="home-button" src="https://bingothon.com/pictures/youtube-social.png"/></a></li>
+	  </ul>
+	</header>
     {{> sidebar/html}}
     <div class="pusher">
       <header>

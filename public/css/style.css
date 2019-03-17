@@ -49,35 +49,158 @@ body {
   margin: 8px;
 }
 
-.nav{
-  font-family: "Fugaz One";
+.header {
+  background-color: rgba(0, 0, 0, 0.4);
+  box-shadow: 1px 1px 4px 0 rgba(0,0,0,.1);
   width: 100%;
-  max-width: auto;
-  background-color: rgba(0, 0, 0, 0.2);
-  text-transform: uppercase;
-  margin-bottom: 10px;
-  font-size: 16px;
+  height: 40px;
+  z-index: 3;
+  position: relative;
+  margin-bottom: 1em;
 }
 
-a {
-  color: white;
-  font-style: normal;
-  text-decoration: solid;
+.header li{
+	font-family: Fugaz One;
+	text-transform: uppercase;
+}
+.header ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow: hidden;
+  background-color: rgba(0, 0, 0, 0.8);
 }
 
-.nav ul{
-	margin: 0;
-	padding: 0;
-	list-style-type: none;
-	
+.header li a{
+  display: block;
+  padding: 20px 20px;
 }
-.nav ul li{
-	display: inline-block;
-	margin-right: 20px;
-	width: auto;
-	height: 40px;
-	line-height:40px;
-	vertical-align:middle;
+
+.header li a {
+  color: #fff;
+  text-decoration: none;
+}
+
+.header li a:hover,
+.header .menu-btn:hover {
+  background-color: #982f33;
+}
+
+.header .logo {
+  display: block;
+  float: left;
+  font-size: 2em;
+  text-decoration: none;
+}
+
+/* menu */
+
+.header .menu {
+  clear: both;
+  max-height: 0;
+  transition: max-height .2s ease-out;
+}
+
+/* menu icon */
+
+.header .menu-icon {
+  cursor: pointer;
+  display: inline-block;
+  float: right;
+  padding: 20px 20px;
+  position: relative;
+  user-select: none;
+}
+
+.header .menu-icon .navicon {
+  background: #fff;
+  display: block;
+  height: 2px;
+  position: relative;
+  transition: background .2s ease-out;
+  width: 18px;
+}
+
+.header .menu-icon .navicon:before,
+.header .menu-icon .navicon:after {
+  background: #fff;
+  content: '';
+  display: block;
+  height: 100%;
+  position: absolute;
+  transition: all .2s ease-out;
+  width: 100%;
+}
+
+.header .menu-icon .navicon:before {
+  top: 5px;
+}
+
+.header .menu-icon .navicon:after {
+  top: -5px;
+}
+
+/* menu btn */
+
+.header .menu-btn {
+  display: none;
+}
+
+.header .menu-btn:checked ~ .menu {
+  max-height: 732px;
+}
+
+.header .menu-btn:checked ~ .menu-icon .navicon {
+  background: transparent;
+}
+
+.header .menu-btn:checked ~ .menu-icon .navicon:before {
+  transform: rotate(-45deg);
+}
+
+.header .menu-btn:checked ~ .menu-icon .navicon:after {
+  transform: rotate(45deg);
+}
+
+.header .menu-btn:checked ~ .menu-icon:not(.steps) .navicon:before,
+.header .menu-btn:checked ~ .menu-icon:not(.steps) .navicon:after {
+  top: 0;
+}
+
+/* 64em = 1024px */
+
+@media (min-width: 64em) {
+  .header{
+  	overflow: hidden;
+  }
+  .header ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    overflow: hidden;
+    background: none;
+  }
+  .header li {
+  	font-size: 16px;
+  	font-family: Fugaz One;
+    float: left;
+    text-transform:uppercase;
+  }
+  .header li a {
+    padding: 10px 14px;
+  }
+  .header li .imagebutton {
+    padding: 0px;
+    margin-right: 5px;
+  }
+  .header .menu {
+    clear: none;
+    float: left;
+    max-height: none;
+  }
+  .header .menu-icon {
+    display: none;
+  }
 }
 .home-button{
 	width: 40px;
