@@ -3,6 +3,12 @@
   src: url("../fonts/icomoon.ttf") format("truetype");
 }
 
+.bingothon-logo-bw {
+  max-width: 2em;
+  height: 2em;
+  margin-right: 5px;
+}
+
 .icon-discord:before {
   font-family: "Icomoon-Custom";
   content: "\e900";

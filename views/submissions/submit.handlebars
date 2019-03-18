@@ -32,19 +32,19 @@
 
       <div class="ui container">
         <div class="ui hidden divider"></div>
-        <!--<div class="ui" {{#if profile.speedrunComUser}} style="display: none;" {{/if}}>-->
-          <!--<div class="ui warning message">-->
-            <!--<div class="header">No Speedrun.com username set!</div>-->
-            <!--<p>You cannot submit runs unless you have set your Speedrun.com username in your connections page!</p>-->
-            <!--<a href="/user/connections">Click here to go to your connections page!</a>-->
-          <!--</div>-->
-          <!--<div class="ui hidden divider"></div>-->
-        <!--</div>-->
+        <div class="ui" {{#if profile.speedrunComUser}} style="display: none;" {{/if}}>
+          <div class="ui warning message">
+            <div class="header">No Speedrun.com username set!</div>
+            <p>You cannot submit runs unless you have set your Speedrun.com username in your connections page!</p>
+            <a href="/user/connections">Click here to go to your connections page!</a>
+          </div>
+          <div class="ui hidden divider"></div>
+        </div>
         <div class="ui" {{#if profile.connections.discord.username}} style="display: none;" {{/if}}>
           <div class="ui warning message">
             <div class="header">Discord not linked to your Account!</div>
             <p>Discord is the main tool for all forms of communication leading up to the main event and will also be the way for the game selection and scheduling team to contact you.</p>
-            <p>If you don't have an account yet, please get one <a href="https://discordapp.com/" target="_blank">here</a> and join our <a href="http://discord.powerupwithpride.org" target="_blank">Discord Server.</a></p>
+            <p>If you don't have an account yet, please get one <a href="https://discordapp.com/" target="_blank">here</a> and join our <a href="https://discord.bingothon.com" target="_blank">Discord Server.</a></p>
             <div class="ui hidden divider"></div>
             <a href="/user/connections">Click here to go to your connections page!</a>
           </div>
@@ -77,8 +77,8 @@
                 </div>
                 <div class="three fields">
                   <div class="required {{#unless profile.connections.discord.username}}disabled {{/unless}}field">
-                    <label>Category</label>
-                    <input type="text" name="category" placeholder="Any%, 100%, ..." invalidname="category" maxlength="32">
+                    <label>Bingo Category</label>
+                    <input type="text" name="category" placeholder="Single, Blackout, ..." invalidname="category" maxlength="32">
                   </div>
                   <div class="required {{#unless profile.connections.discord.username}}disabled {{/unless}}field popup" data-content="Your estimate should be the time that you can reliably complete a no reset run in. It must also include any non-optional content after last control, for example watching credits in Super Metroid.">
                     <label>Estimate</label>
